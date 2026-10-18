@@ -151,9 +151,16 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
+  // Jump straight to the form. Measured from layout offsets, not getBoundingClientRect:
+  // the reply card is still mid-unfold (transformed) when this runs.
   function goToReply() {
+    const reply = replyRef.current;
     replyTitleRef.current?.focus({ preventScroll: true });
-    replyRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? "instant" : "smooth", block: "start" });
+    if (!reply) return;
+    let top = 0;
+    for (let el: HTMLElement | null = reply; el; el = el.offsetParent as HTMLElement | null) top += el.offsetTop;
+    const margin = parseFloat(getComputedStyle(reply).scrollMarginTop) || 0;
+    window.scrollTo({ top: top - margin, behavior: "instant" });
   }
 
   useEffect(() => {

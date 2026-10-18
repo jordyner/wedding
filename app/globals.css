@@ -702,17 +702,22 @@ a:hover {
   justify-items: center;
   margin-top: clamp(1.5rem, 5vw, 2.25rem);
 }
-/* frosted and translucent: readable when it floats over the card, but quieter than it */
+/* Minimal: a small frosted pill with a hairline, readable over the card but never
+   louder than it. Still a 44px tap target. */
 .respond .btn {
-  border-color: rgb(122 93 53 / 0.55);
-  background: rgb(253 250 243 / 0.55);
-  -webkit-backdrop-filter: blur(8px) saturate(1.1);
-  backdrop-filter: blur(8px) saturate(1.1);
-  box-shadow: 0 6px 18px -10px rgb(74 58 38 / 0.3);
+  min-height: 2.75rem;
+  padding: 0.35rem 1.35rem;
+  border-color: rgb(122 93 53 / 0.32);
+  background: rgb(253 250 243 / 0.4);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-size: 0.95rem;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
 }
 .respond .btn:hover {
-  border-color: var(--accent);
-  background: rgb(253 250 243 / 0.8);
+  border-color: rgb(122 93 53 / 0.6);
+  background: rgb(253 250 243 / 0.7);
 }
 .respond.is-entering {
   animation: rise-in 500ms var(--ease-out) 300ms both;
