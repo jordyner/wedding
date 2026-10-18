@@ -54,10 +54,12 @@ test.describe("envelope", () => {
     await page.screenshot({ path: test.info().outputPath("open.png"), fullPage: true });
   });
 
-  test("opens with the keyboard (Enter and Space)", async ({ page }) => {
+  test("opens with the keyboard (Enter and Space)", async ({ page, browserName }) => {
     for (const key of ["Enter", "Space"]) {
       await page.goto("/pozvanka");
-      await page.keyboard.press("Tab");
+      // Safari only tabs to buttons when "Press Tab to highlight each item" is enabled.
+      if (browserName === "webkit") await page.getByRole("button", { name: "Otevřít obálku s pozvánkou" }).focus();
+      else await page.keyboard.press("Tab");
       await expect(page.getByRole("button", { name: "Otevřít obálku s pozvánkou" })).toBeFocused();
       await page.keyboard.press(key);
       await expect(page.getByTestId("invitation")).toBeVisible();

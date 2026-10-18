@@ -1,18 +1,28 @@
 import { event } from "@/content/event";
 
-/** The paper invitation. Real HTML text, all facts from content/event.ts. */
-export function InvitationCard() {
+/**
+ * The paper invitation. Real HTML text, all facts from content/event.ts.
+ * `decorative` renders the same face with inline elements only, for the copy of the
+ * card that sits inside the envelope (inside a <button>, hidden from assistive tech).
+ */
+export function InvitationCard({ decorative = false }: { decorative?: boolean }) {
+  const P = decorative ? "span" : "p";
+  const H1 = decorative ? "span" : "h1";
+  const Dl = decorative ? "span" : "dl";
+  const Dd = decorative ? "span" : "dd";
+  const dt = (label: string) => (decorative ? null : <dt className="sr-only">{label}</dt>);
+
   return (
     <>
-      <p className="inv-opening">{event.copy.cardOpening}</p>
+      <P className="inv-opening">{event.copy.cardOpening}</P>
 
-      <h1 className="inv-names" id="invitation-title">
+      <H1 className="inv-names" id={decorative ? undefined : "invitation-title"}>
         <span className="name name-1">{event.couple.first}</span>
         <span className="amp">&amp;</span>
         <span className="name name-2">{event.couple.second}</span>
-      </h1>
+      </H1>
 
-      <p className="inv-invite">{event.copy.cardInvitation}</p>
+      <P className="inv-invite">{event.copy.cardInvitation}</P>
 
       <svg className="ornament" viewBox="0 0 144 16" aria-hidden="true">
         <path className="draw draw-l" d="M58 8 H0" stroke="currentColor" strokeWidth="1" pathLength={1} />
@@ -29,15 +39,15 @@ export function InvitationCard() {
         <circle cx="82" cy="8" r="1.2" fill="currentColor" />
       </svg>
 
-      <dl className="inv-details">
-        <dt className="sr-only">Datum</dt>
-        <dd className="inv-date">{event.date}</dd>
-        <dt className="sr-only">Čas</dt>
-        <dd className="inv-time">{event.time}</dd>
-        <dt className="sr-only">Místo</dt>
-        <dd className="inv-venue">{event.venue.name}</dd>
-        {event.venue.address ? <dd className="inv-address">{event.venue.address}</dd> : null}
-      </dl>
+      <Dl className="inv-details">
+        {dt("Datum")}
+        <Dd className="inv-detail inv-date">{event.date}</Dd>
+        {dt("Čas")}
+        <Dd className="inv-detail inv-time">{event.time}</Dd>
+        {dt("Místo")}
+        <Dd className="inv-detail inv-venue">{event.venue.name}</Dd>
+        {event.venue.address ? <Dd className="inv-detail inv-address">{event.venue.address}</Dd> : null}
+      </Dl>
     </>
   );
 }

@@ -16,7 +16,7 @@ export const event = {
   /** Shown on the card in small caps, e.g. "sobota 12. června 2027". */
   date: "sobota 22. května 2027",
   /** e.g. "ve 14 hodin" */
-  time: "[čas obřadu]",
+  time: "13:00",
   venue: {
     /** e.g. "Zámek Loučeň" */
     name: "Pernek",

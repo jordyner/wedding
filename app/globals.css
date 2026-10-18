@@ -48,10 +48,13 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   background: var(--table);
+  /* no rubber-band bounce revealing the in-app browser's white backdrop */
+  overscroll-behavior: none;
 }
 
 body {
   margin: 0;
+  overscroll-behavior: none;
   min-height: 100svh;
   color: var(--ink);
   background:
@@ -133,10 +136,12 @@ a:hover {
 }
 
 .page {
+  --pad-top: clamp(2rem, 7vw, 5rem);
+  --pad-bottom: clamp(3rem, 8vw, 6rem);
   position: relative;
   z-index: 1;
   min-height: 100svh;
-  padding: clamp(2rem, 7vw, 5rem) 1rem clamp(3rem, 8vw, 6rem);
+  padding: var(--pad-top) 1rem var(--pad-bottom);
 }
 
 .sheet {
@@ -148,7 +153,8 @@ a:hover {
    Envelope
    ------------------------------------------------------------------ */
 .envelope-stage {
-  min-height: calc(100svh - 2 * clamp(2rem, 7vw, 5rem));
+  /* exactly one screen tall: nothing to drag around before opening */
+  min-height: calc(100svh - var(--pad-top) - var(--pad-bottom));
   display: grid;
   place-content: center;
   justify-items: center;
@@ -176,7 +182,8 @@ a:hover {
 .envelope-float {
   animation: envelope-float 5.5s ease-in-out infinite;
 }
-.envelope-stage:not(.is-closed) .envelope-float {
+.envelope-stage:not(.is-closed) .envelope-float,
+.envelope-float:hover {
   animation-play-state: paused;
 }
 .envelope-tilt {
@@ -188,45 +195,49 @@ a:hover {
   }
 }
 
-.envelope {
+.envelope,
+.envelope-ghost {
   --w: min(86vw, 440px);
+  /* depth for the flap: a short perspective makes the hinge read as 3D */
+  perspective: 720px;
+  perspective-origin: 50% 10%;
+}
+
+.envelope {
+  --pull-n: 0;
+  --flap-lift: 0deg;
   position: relative;
+  display: block;
   width: var(--w);
   aspect-ratio: 10 / 7;
   padding: 0;
   border: 0;
   background: none;
   cursor: pointer;
-  perspective: 1400px;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  transform: translateY(var(--lift, 0px)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform 600ms var(--ease-out);
+  -webkit-user-select: none;
+  user-select: none;
+  /* vertical drags pull the card instead of scrolling the page */
+  touch-action: none;
+  scale: 1;
+  transition: scale 220ms var(--ease-out);
 }
-.envelope-tilt[data-tilting] .envelope {
-  transition-duration: 140ms;
-}
-.envelope:active:not([aria-disabled="true"]) {
-  --lift: 2px;
+.envelope[data-pressed] {
+  scale: 0.975;
 }
 .envelope:focus-visible {
   outline-offset: 10px;
   border-radius: 6px;
 }
 /* Hover or keyboard focus: the flap lifts a little and the card peeks out. */
+/* Hover or keyboard focus: the flap lifts slightly toward the viewer. */
 @media (hover: hover) {
   .envelope:not([aria-disabled="true"]):hover {
-    --lift: -4px;
-  }
-  .envelope:not([aria-disabled="true"]):hover .env-flap {
-    transform: rotateX(-16deg);
-  }
-  .envelope:not([aria-disabled="true"]):hover .env-card {
-    transform: translateY(-9%);
+    --flap-lift: 6deg;
   }
 }
-.envelope:not([aria-disabled="true"]):focus-visible .env-card {
-  transform: translateY(-9%);
+.envelope:not([aria-disabled="true"]):focus-visible {
+  --flap-lift: 6deg;
 }
 .envelope[aria-disabled="true"] {
   cursor: default;
@@ -236,63 +247,62 @@ a:hover {
   position: absolute;
   inset: 0;
   border-radius: 3px;
-  background: #e2c9c1;
-  box-shadow: var(--shadow-paper);
+  background: linear-gradient(180deg, #f2e2dc 0%, #eadad3 55%, #e2cdc6 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 246 242 / 0.35),
+    0 1px 1px rgb(80 50 44 / 0.08),
+    0 10px 18px -8px rgb(80 50 44 / 0.28),
+    0 34px 60px -26px rgb(80 50 44 / 0.4);
 }
 
+.env-card-window {
+  /* reaches far above the envelope, ends exactly at its bottom edge */
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 300%;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
 .env-card {
   position: absolute;
   left: 7%;
   right: 7%;
-  top: 6%;
-  height: 86%;
-  z-index: 1;
-  display: grid;
-  align-content: start;
-  justify-items: center;
-  padding-top: 7%;
-  text-align: center;
-  overflow: hidden;
-  color: var(--ink);
+  /* 6 % of the envelope's height below its top edge */
+  top: calc(200% / 3 + 2%);
+  height: calc(100% / 3 - 2%);
+  transform: translateY(calc(max(0, var(--pull-n) - 0.45) * -40%));
   transition: transform 500ms var(--ease-out);
 }
-.env-card::after {
-  content: "";
+.mini-invitation {
   position: absolute;
-  inset: 5px 5px 0;
-  border: 1px solid var(--blush-line);
-  border-bottom: 0;
-  box-shadow: inset 0 0 0 3px var(--paper), inset 0 0 0 4px rgb(220 183 174 / 0.55);
-  pointer-events: none;
+  top: 0;
+  left: 0;
+  display: block;
+  width: min(100vw - 2rem, 34rem);
+  transform: scale(var(--mini-scale, 0.8));
+  transform-origin: 0 0;
+  box-shadow: none;
 }
-.env-card .mini-opening {
-  font-style: italic;
-  font-size: clamp(0.8125rem, 3.2vw, 1rem);
-  color: var(--ink);
-}
-.env-card .mini-names {
-  display: grid;
-  font-family: var(--font-script), cursive;
-  font-size: clamp(1.375rem, 6.2vw, 2rem);
-  line-height: 1.08;
-  margin-top: 0.3em;
-}
-.env-card .mini-names .amp {
-  font-family: var(--font-serif), serif;
-  font-style: italic;
-  font-size: 0.42em;
-  line-height: 1.2;
-  color: var(--accent);
+/* no grain layer on the miniature: it is too small to need one, and the extra
+   layer could be composited above the pocket while the envelope moves */
+.mini-invitation::before {
+  display: none;
 }
 
 .env-pocket {
   position: absolute;
   inset: 0;
   z-index: 2;
+  display: block;
+}
+.env-pocket svg {
+  display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 -1px 1.5px rgb(80 50 44 / 0.10));
 }
 
 .env-flap {
@@ -304,7 +314,12 @@ a:hover {
   z-index: 3;
   transform-origin: 50% 0;
   transform-style: preserve-3d;
+  transform: rotateX(calc(var(--flap-lift) + var(--pull-n) * 76deg));
   transition: transform 450ms var(--ease-out);
+}
+.envelope[data-pressed] .env-flap,
+.envelope[data-pressed] .env-card {
+  transition-duration: 90ms;
 }
 .env-flap-face {
   position: absolute;
@@ -320,88 +335,102 @@ a:hover {
 }
 .env-flap-back {
   transform: rotateX(180deg);
+  opacity: 0;
+}
+.env-flap.is-open .env-flap-front {
+  opacity: 0;
+}
+.env-flap.is-open .env-flap-back {
+  opacity: 1;
+}
+.env-flap-shade {
+  /* light falling off as the flap turns */
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  clip-path: polygon(0 0, 100% 0, 54% 90%, 50% 100%, 46% 90%);
+  background: linear-gradient(180deg, rgb(70 36 30 / 0.55), rgb(70 36 30 / 0.2));
+  opacity: 0;
+}
+.env-flap-back .env-flap-shade {
+  /* the inside face is drawn upside down, so its shading is too */
+  clip-path: polygon(0 100%, 100% 100%, 54% 10%, 50% 0, 46% 10%);
+  background: linear-gradient(0deg, rgb(70 36 30 / 0.55), rgb(70 36 30 / 0.2));
+  opacity: 0.12;
+}
+.env-flap.is-open {
+  transform: rotateX(176deg);
+  z-index: 0;
 }
 
+/* ---- Wax seal ---- */
 .env-seal {
   position: absolute;
   left: 50%;
   top: 100%;
-  width: clamp(3.5rem, 15vw, 4.25rem);
-  aspect-ratio: 1;
-  translate: -50% -58%;
-  color: #fff7f2;
-  font-family: var(--font-script), cursive;
-  font-size: clamp(1.125rem, 5vw, 1.375rem);
-  line-height: 1;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-.env-seal.is-long {
-  font-size: clamp(0.75rem, 3.2vw, 0.875rem);
-}
-.env-seal::before {
-  /* contact shadow on the flap */
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  box-shadow: 0 1px 2px rgb(80 50 44 / 0.22);
+  width: clamp(4.5rem, 21vw, 5.5rem);
+  aspect-ratio: 116 / 120;
+  translate: -50% -64%;
 }
 .seal-half {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--seal);
-  box-shadow:
-    inset 0 0 0 4px var(--seal),
-    inset 0 0 0 5px rgb(255 247 242 / 0.7);
 }
-.seal-mono {
-  white-space: nowrap;
-  translate: 0 0.08em;
+.wax-seal {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.wax-mono {
+  font-family: var(--font-script), cursive;
+}
+.wax-glint {
+  animation: wax-glint 6s ease-in-out 1.2s infinite;
+}
+@keyframes wax-glint {
+  0%,
+  72% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(190px);
+  }
 }
 
-/* Opening choreography (~1.6 s, see InvitationExperience):
-   seal is pressed and cracks → flap lifts → card rises → envelope settles away. */
+/* Opening choreography (~1.5 s, see InvitationExperience):
+   seal is pressed and cracks → flap swings open in 3D → card rises out. */
 .is-opening .env-seal {
   animation: seal-press 160ms ease-out;
 }
-.is-opening .env-seal::before {
-  animation: fade-out 160ms ease 100ms forwards;
-}
 .is-opening .seal-left {
-  animation: crack-left 520ms var(--ease-out) 100ms forwards;
+  animation: crack-left 560ms var(--ease-out) 110ms forwards;
 }
 .is-opening .seal-right {
-  animation: crack-right 520ms var(--ease-out) 100ms forwards;
+  animation: crack-right 560ms var(--ease-out) 110ms forwards;
 }
 .is-opening .env-flap,
 .is-opening .env-card {
   will-change: transform;
 }
 .is-opening .env-flap {
-  animation: flap-open 500ms var(--ease-in-out) 300ms both;
+  animation: flap-open 620ms var(--ease-in-out) 300ms both;
+}
+.is-opening .env-flap-front {
+  animation: face-out 620ms var(--ease-in-out) 300ms both;
+}
+.is-opening .env-flap-back {
+  animation: face-in 620ms var(--ease-in-out) 300ms both;
+}
+.is-opening .env-flap-front .env-flap-shade {
+  animation: shade-in 620ms var(--ease-in-out) 300ms both;
+}
+.is-opening .env-flap-back .env-flap-shade {
+  animation: shade-out 620ms var(--ease-in-out) 300ms both;
 }
 .is-opening .env-card {
-  animation: card-rise 600ms var(--ease-out) 620ms both;
+  animation: card-rise 680ms var(--ease-out) 820ms both;
 }
-.is-settling .env-flap {
-  transform: rotateX(180deg);
-  z-index: 0;
-}
-.is-settling .env-seal {
-  opacity: 0;
-}
-.is-settling .env-card {
-  transform: translateY(-56%);
-}
-.is-settling .envelope {
-  animation: envelope-away 320ms var(--ease-in-out) forwards;
-}
-.is-settling .envelope-intro,
-.is-settling .envelope-hint,
 .is-opening .envelope-hint {
   transition: opacity 240ms ease;
   opacity: 0;
@@ -409,39 +438,31 @@ a:hover {
 
 @keyframes seal-press {
   50% {
-    scale: 0.9;
+    scale: 0.92;
   }
 }
 @keyframes crack-left {
-  25% {
-    transform: translate(-5%, 1%) rotate(-5deg);
+  22% {
+    transform: translate(-5%, 1%) rotate(-6deg);
     opacity: 1;
   }
   100% {
-    transform: translate(-26%, 40%) rotate(-26deg);
+    transform: translate(-30%, 55%) rotate(-32deg);
     opacity: 0;
   }
 }
 @keyframes crack-right {
-  25% {
-    transform: translate(5%, 2%) rotate(4deg);
+  22% {
+    transform: translate(5%, 2%) rotate(5deg);
     opacity: 1;
   }
   100% {
-    transform: translate(24%, 46%) rotate(22deg);
-    opacity: 0;
-  }
-}
-@keyframes fade-out {
-  to {
+    transform: translate(28%, 62%) rotate(26deg);
     opacity: 0;
   }
 }
 @keyframes flap-open {
-  0% {
-    transform: rotateX(0deg);
-    z-index: 3;
-  }
+  0%,
   49% {
     z-index: 3;
   }
@@ -449,23 +470,62 @@ a:hover {
     z-index: 0;
   }
   100% {
-    transform: rotateX(180deg);
     z-index: 0;
+    transform: rotateX(176deg);
+  }
+}
+@keyframes face-out {
+  0%,
+  51.9% {
+    opacity: 1;
+  }
+  52%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes face-in {
+  0%,
+  51.9% {
+    opacity: 0;
+  }
+  52%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes shade-in {
+  0% {
+    opacity: 0;
+  }
+  50%,
+  100% {
+    opacity: 0.45;
+  }
+}
+@keyframes shade-out {
+  0%,
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.12;
   }
 }
 @keyframes card-rise {
-  from {
-    transform: translateY(0);
-  }
   to {
-    transform: translateY(-56%);
+    transform: translateY(-45%);
   }
 }
-@keyframes envelope-away {
-  to {
-    opacity: 0;
-    transform: translateY(18px) scale(0.98);
-  }
+
+/* After opening: the envelope is drawn away under the card (driven from JS). */
+.envelope-ghost {
+  position: fixed;
+  z-index: 1;
+  pointer-events: none;
+}
+.envelope-ghost.is-front {
+  z-index: 3;
 }
 
 /* ------------------------------------------------------------------
@@ -514,64 +574,30 @@ a:hover {
   opacity: 1;
 }
 
-/* Written in ink: names are drawn left to right, then the rest settles in. */
-.is-writing .inv-opening {
-  animation: rise-in 500ms var(--ease-out) 100ms both;
+/* As the card comes forward, the lower half settles in. */
+.is-revealing .ornament .draw {
+  animation: draw-line 650ms var(--ease-out) 480ms both;
 }
-.is-writing .inv-names .name {
-  -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
-  mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
-  -webkit-mask-size: 230% 100%;
-  mask-size: 230% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  animation: ink-write 680ms cubic-bezier(0.45, 0.05, 0.35, 1) both;
+.is-revealing .ornament circle {
+  animation: fade-in 300ms ease 850ms both;
 }
-.is-writing .name-1 {
-  animation-delay: 250ms;
+.is-revealing .inv-detail {
+  animation: rise-in 600ms var(--ease-out) both;
 }
-.is-writing .name-2 {
-  animation-delay: 820ms;
+.is-revealing .inv-date {
+  animation-delay: 580ms;
 }
-.is-writing .inv-names .amp {
-  animation: rise-in 400ms ease 700ms both;
+.is-revealing .inv-time {
+  animation-delay: 650ms;
 }
-.is-writing .inv-invite {
-  animation: rise-in 600ms var(--ease-out) 1300ms both;
+.is-revealing .inv-venue {
+  animation-delay: 720ms;
+}
+.is-revealing .inv-address {
+  animation-delay: 790ms;
 }
 .ornament .draw {
   stroke-dasharray: 1;
-}
-.is-writing .ornament .draw {
-  animation: draw-line 600ms var(--ease-out) 1450ms both;
-}
-.is-writing .ornament circle {
-  animation: fade-in 300ms ease 1800ms both;
-}
-.is-writing .inv-details dd {
-  animation: rise-in 600ms var(--ease-out) both;
-}
-.is-writing .inv-details dd:nth-of-type(1) {
-  animation-delay: 1550ms;
-}
-.is-writing .inv-details dd:nth-of-type(2) {
-  animation-delay: 1630ms;
-}
-.is-writing .inv-details dd:nth-of-type(3) {
-  animation-delay: 1710ms;
-}
-.is-writing .inv-details dd:nth-of-type(4) {
-  animation-delay: 1790ms;
-}
-@keyframes ink-write {
-  from {
-    -webkit-mask-position: 100% 0;
-    mask-position: 100% 0;
-  }
-  to {
-    -webkit-mask-position: 0 0;
-    mask-position: 0 0;
-  }
 }
 @keyframes draw-line {
   from {
@@ -587,16 +613,13 @@ a:hover {
     transform: translateY(8px);
   }
 }
-.invitation.is-entering {
-  animation: card-arrive 620ms var(--ease-out) both;
-}
-@keyframes card-arrive {
-  from {
-    opacity: 0;
-    transform: translateY(28px) scale(0.975);
-  }
-}
 
+.inv-opening,
+.inv-invite,
+.inv-names,
+.inv-detail {
+  display: block;
+}
 .inv-opening {
   margin: 0;
   font-style: italic;
@@ -624,10 +647,6 @@ a:hover {
 }
 .inv-names .name {
   display: block;
-  width: fit-content;
-  margin-inline: auto;
-  /* room for the script's swashes inside the ink mask */
-  padding-inline: 0.3em;
 }
 
 .inv-invite {
@@ -651,7 +670,7 @@ a:hover {
   display: grid;
   gap: 0.35rem;
 }
-.inv-details dd {
+.inv-detail {
   margin: 0;
 }
 .inv-date {
@@ -682,7 +701,7 @@ a:hover {
   margin-top: clamp(2rem, 6vw, 2.75rem);
 }
 .respond.is-entering {
-  animation: rise-in 500ms var(--ease-out) 1900ms both;
+  animation: rise-in 500ms var(--ease-out) 300ms both;
 }
 @keyframes fade-in {
   from {
