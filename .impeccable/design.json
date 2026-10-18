@@ -1,0 +1,514 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T06:54:28+00:00",
+  "title": "Design System: Svatba Jordánovi",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Cocoa Rose",
+        "canonical": "var(--accent)",
+        "oklch": "oklch(52.7% 0.090 25)",
+        "tonalRamp": [
+          "#220000",
+          "#450d0d",
+          "#672926",
+          "#894843",
+          "#ac6762",
+          "#d18882",
+          "#fbb2ab",
+          "#ffddd6"
+        ]
+      },
+      "accent-strong": {
+        "role": "primary",
+        "displayName": "Deep Cocoa Rose",
+        "canonical": "var(--accent-strong)",
+        "oklch": "oklch(45.4% 0.085 25)",
+        "tonalRamp": [
+          "#220000",
+          "#450d0d",
+          "#652b28",
+          "#874945",
+          "#aa6964",
+          "#ce8a84",
+          "#fab2ac",
+          "#ffddd6"
+        ]
+      },
+      "seal": {
+        "role": "secondary",
+        "displayName": "Pressed Blush",
+        "canonical": "var(--seal)",
+        "oklch": "oklch(68.9% 0.072 27)",
+        "tonalRamp": [
+          "#220000",
+          "#401210",
+          "#602f2b",
+          "#824d47",
+          "#a46d66",
+          "#c88d86",
+          "#f3b6ae",
+          "#ffddd5"
+        ]
+      },
+      "blush-line": {
+        "role": "secondary",
+        "displayName": "Blush Hairline",
+        "canonical": "var(--blush-line)",
+        "oklch": "oklch(80.9% 0.045 34)",
+        "tonalRamp": [
+          "#1a0401",
+          "#371b15",
+          "#553730",
+          "#75554d",
+          "#96746c",
+          "#b9958c",
+          "#e3beb4",
+          "#ffe5db"
+        ]
+      },
+      "liner": {
+        "role": "tertiary",
+        "displayName": "Sage Liner",
+        "canonical": "var(--liner)",
+        "oklch": "oklch(90.0% 0.021 131)",
+        "tonalRamp": [
+          "#080d05",
+          "#20261c",
+          "#3c4237",
+          "#596054",
+          "#798073",
+          "#9aa194",
+          "#c2cabd",
+          "#eaf2e3"
+        ]
+      },
+      "liner-stripe": {
+        "role": "tertiary",
+        "displayName": "Sage Stripe",
+        "canonical": "var(--liner-stripe)",
+        "oklch": "oklch(86.4% 0.025 132)",
+        "tonalRamp": [
+          "#070d04",
+          "#1f271a",
+          "#3b4335",
+          "#586152",
+          "#788171",
+          "#99a292",
+          "#c1cbba",
+          "#e8f2e1"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Cocoa Ink",
+        "canonical": "var(--ink)",
+        "oklch": "oklch(32.6% 0.013 33)",
+        "tonalRamp": [
+          "#100908",
+          "#2a2220",
+          "#473d3b",
+          "#655b59",
+          "#857b78",
+          "#a79c99",
+          "#d0c4c2",
+          "#f7ebe9"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Soft Cocoa",
+        "canonical": "var(--ink-soft)",
+        "oklch": "oklch(46.2% 0.025 36)",
+        "tonalRamp": [
+          "#140705",
+          "#2f201b",
+          "#4c3b37",
+          "#6b5954",
+          "#8c7873",
+          "#ad9994",
+          "#d7c2bc",
+          "#ffe9e3"
+        ]
+      },
+      "control-line": {
+        "role": "neutral",
+        "displayName": "Control Taupe",
+        "canonical": "var(--control-line)",
+        "oklch": "oklch(59.7% 0.028 36)",
+        "tonalRamp": [
+          "#150704",
+          "#301f1b",
+          "#4d3b36",
+          "#6c5853",
+          "#8d7872",
+          "#af9993",
+          "#d8c2bb",
+          "#ffe9e2"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Ivory Paper",
+        "canonical": "var(--paper)",
+        "oklch": "oklch(98.0% 0.010 82)",
+        "tonalRamp": [
+          "#0d0b07",
+          "#26241f",
+          "#423f3a",
+          "#605d57",
+          "#807d77",
+          "#a29e97",
+          "#cbc7c0",
+          "#f2eee7"
+        ]
+      },
+      "reply-paper": {
+        "role": "neutral",
+        "displayName": "Blush Reply Paper",
+        "canonical": "var(--reply-paper)",
+        "oklch": "oklch(96.2% 0.012 43)",
+        "tonalRamp": [
+          "#100a07",
+          "#29221f",
+          "#463e3b",
+          "#645c58",
+          "#847b78",
+          "#a59c98",
+          "#cfc5c1",
+          "#f6ece8"
+        ]
+      },
+      "table": {
+        "role": "neutral",
+        "displayName": "Tabletop",
+        "canonical": "var(--table)",
+        "oklch": "oklch(93.1% 0.012 51)",
+        "tonalRamp": [
+          "#0f0a07",
+          "#29221f",
+          "#453e3a",
+          "#635c58",
+          "#837b77",
+          "#a59c98",
+          "#cec5c0",
+          "#f5ece7"
+        ]
+      },
+      "table-light": {
+        "role": "neutral",
+        "displayName": "Tabletop Light",
+        "canonical": "var(--table-light)",
+        "oklch": "oklch(96.2% 0.008 56)",
+        "tonalRamp": [
+          "#0e0a08",
+          "#272320",
+          "#433f3c",
+          "#615c59",
+          "#817c78",
+          "#a39d99",
+          "#ccc6c2",
+          "#f3ede9"
+        ]
+      },
+      "envelope-side": {
+        "role": "neutral",
+        "displayName": "Envelope Side",
+        "canonical": "var(--envelope-side)",
+        "oklch": "oklch(86.7% 0.030 39)",
+        "tonalRamp": [
+          "#160703",
+          "#311f19",
+          "#4e3a34",
+          "#6d5851",
+          "#8e7770",
+          "#b09891",
+          "#dac1b9",
+          "#ffe8e0"
+        ]
+      },
+      "envelope-bottom": {
+        "role": "neutral",
+        "displayName": "Envelope Bottom",
+        "canonical": "var(--envelope-bottom)",
+        "oklch": "oklch(90.8% 0.023 41)",
+        "tonalRamp": [
+          "#130805",
+          "#2e201b",
+          "#4b3c36",
+          "#6a5a54",
+          "#8a7973",
+          "#ac9a94",
+          "#d5c3bc",
+          "#fdeae3"
+        ]
+      },
+      "envelope-flap": {
+        "role": "neutral",
+        "displayName": "Envelope Flap",
+        "canonical": "var(--envelope-flap)",
+        "oklch": "oklch(88.1% 0.028 40)",
+        "tonalRamp": [
+          "#150704",
+          "#301f1a",
+          "#4d3b35",
+          "#6c5952",
+          "#8d7871",
+          "#af9991",
+          "#d8c2ba",
+          "#ffe9e1"
+        ]
+      },
+      "error": {
+        "role": "neutral",
+        "displayName": "Error Brick",
+        "canonical": "var(--error)",
+        "oklch": "oklch(48.9% 0.147 28)",
+        "tonalRamp": [
+          "#220000",
+          "#450d0a",
+          "#6a2721",
+          "#924139",
+          "#b86056",
+          "#d6857b",
+          "#fbb2a8",
+          "#ffddd4"
+        ]
+      },
+      "success": {
+        "role": "neutral",
+        "displayName": "Garden Green",
+        "canonical": "var(--success)",
+        "oklch": "oklch(49.6% 0.061 141)",
+        "tonalRamp": [
+          "#001100",
+          "#112b0d",
+          "#2d4829",
+          "#4b6646",
+          "#6a8764",
+          "#8aa885",
+          "#b2d2ad",
+          "#d9f9d3"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Script Names",
+        "purpose": "The couple's names, seal initials, and the names line on standalone reply pages."
+      },
+      "headline": {
+        "displayName": "Italic Headline",
+        "purpose": "Reply card titles and confirmation headings."
+      },
+      "title": {
+        "displayName": "Italic Opening",
+        "purpose": "The card's opening line and the envelope intro."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text; base size of the page."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "Ledes, reply notes, address, status lines."
+      },
+      "label": {
+        "displayName": "Small Caps Label",
+        "purpose": "Date, venue, envelope hint, reply-note run-ins (all-small-caps, 0.1–0.14em)."
+      },
+      "field-label": {
+        "displayName": "Field Label",
+        "purpose": "Form labels and fieldset legends; the only 500 weight."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-paper",
+        "value": "0 1px 1px rgb(80 50 44 / 0.06), 0 6px 14px -6px rgb(80 50 44 / 0.16), 0 28px 60px -24px rgb(80 50 44 / 0.28)",
+        "purpose": "Every card and the envelope back: paper on a table."
+      },
+      {
+        "name": "fold-edge",
+        "value": "drop-shadow(0 2px 2px rgb(80 50 44 / 0.14))",
+        "purpose": "Closed envelope flap over the pocket."
+      },
+      {
+        "name": "primary-press",
+        "value": "0 1px 1px rgb(80 50 44 / 0.12), 0 8px 18px -10px rgb(127 66 62 / 0.6)",
+        "purpose": "Primary button only."
+      },
+      {
+        "name": "seal-print",
+        "value": "inset 0 0 0 4px var(--seal), inset 0 0 0 5px rgb(255 247 242 / 0.7), 0 1px 2px rgb(80 50 44 / 0.22)",
+        "purpose": "Printed ring and contact shadow of the flat seal."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Arrivals: card rise, card arrive, reply unfold, radio dot, hover lifts."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "Flap rotation and envelope settling away."
+      },
+      {
+        "name": "envelope-open",
+        "value": "seal-out 200ms; flap-open 480ms; card-rise 620ms +320ms; envelope-away 320ms; card-arrive 620ms (~1.6s total)",
+        "purpose": "The signature opening choreography."
+      },
+      {
+        "name": "reply-unfold",
+        "value": "560ms ease-out, clip-path inset(0 0 70% 0) to 0 with -14px travel",
+        "purpose": "Reply card appears below the invitation."
+      },
+      {
+        "name": "state",
+        "value": "160–200ms ease",
+        "purpose": "Hover, focus and border-colour changes."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "all animation and transition durations 1ms",
+        "purpose": "prefers-reduced-motion: reduce collapses travel to instant states."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "fluid",
+        "value": "none; single column, sizes via clamp() between ~360px and ~1280px viewports"
+      },
+      {
+        "name": "hover",
+        "value": "(hover: hover)",
+        "purpose": "Envelope lift and flap tilt only on hover-capable devices."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single main action on a card (send reply, send link).",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Odeslat odpověď</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;min-height:3.25rem;padding:.7rem 2rem;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--font-serif), 'EB Garamond', Georgia, serif;font-size:1.1875rem;letter-spacing:.01em;cursor:pointer;transition:background-color 200ms ease,color 200ms ease,transform 200ms cubic-bezier(.22,1,.36,1)} .ds-btn-primary{background:var(--accent);color:#fffaf6;box-shadow:0 1px 1px rgb(80 50 44 / .12),0 8px 18px -10px rgb(127 66 62 / .6)} .ds-btn-primary:hover{background:var(--accent-strong)} .ds-btn:active{transform:translateY(1px)} .ds-btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined pill for secondary navigation back to the invitation or retry.",
+      "html": "<button class=\"ds-btn2\">Zpět na pozvánku</button>",
+      "css": ".ds-btn2{display:inline-flex;align-items:center;justify-content:center;min-height:3.25rem;padding:.7rem 2rem;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--font-serif), 'EB Garamond', Georgia, serif;font-size:1.1875rem;letter-spacing:.01em;cursor:pointer;transition:background-color 200ms ease,color 200ms ease} .ds-btn2:hover{background:rgb(152 85 80 / .07);color:var(--accent-strong)} .ds-btn2:focus-visible{outline:2px solid var(--accent);outline-offset:3px}"
+    },
+    {
+      "name": "Line Input",
+      "kind": "input",
+      "refersTo": "input-line",
+      "description": "Ink-on-a-line text field with label and help text.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">E-mail</span><span class=\"ds-field-help\">Pošleme ti odkaz, přes který můžeš odpověď změnit.</span><input class=\"ds-input\" type=\"email\"></label>",
+      "css": ".ds-field{display:grid;gap:.35rem;font-family:var(--font-serif), 'EB Garamond', Georgia, serif;color:var(--ink)} .ds-field-label{font-size:1.125rem;font-weight:500} .ds-field-help{font-size:1rem;color:var(--ink-soft)} .ds-input{width:100%;min-height:2.75rem;padding:.35rem .1rem .3rem;border:0;border-bottom:1px solid var(--control-line);border-radius:0;background:transparent;font:inherit;font-size:1.1875rem;color:var(--ink);caret-color:var(--accent);transition:border-color 160ms ease,box-shadow 160ms ease} .ds-input:hover{border-bottom-color:var(--ink-soft)} .ds-input:focus{outline:none;border-bottom-color:var(--accent);box-shadow:0 1px 0 0 var(--accent)}"
+    },
+    {
+      "name": "Radio Choice",
+      "kind": "input",
+      "refersTo": "choice-radio",
+      "description": "Printed-ring radio row for attendance and nights.",
+      "html": "<label class=\"ds-choice\"><input type=\"radio\" name=\"ds-a\" checked><span>Ano, rád/a</span></label><label class=\"ds-choice\"><input type=\"radio\" name=\"ds-a\"><span>Bohužel ne</span></label>",
+      "css": ".ds-choice{display:flex;align-items:center;gap:.85rem;min-height:3rem;padding:.3rem .5rem .3rem .25rem;border-radius:6px;cursor:pointer;font-family:var(--font-serif), 'EB Garamond', Georgia, serif;font-size:1.125rem;color:var(--ink);transition:background-color 160ms ease} .ds-choice:hover{background:rgb(152 85 80 / .05)} .ds-choice input{appearance:none;-webkit-appearance:none;flex:none;width:1.375rem;height:1.375rem;margin:0;border:1.5px solid var(--control-line);border-radius:50%;background:var(--paper);display:grid;place-content:center;cursor:pointer} .ds-choice input::before{content:'';width:.7rem;height:.7rem;border-radius:50%;background:var(--accent);scale:0;transition:scale 180ms cubic-bezier(.22,1,.36,1)} .ds-choice input:checked{border-color:var(--accent)} .ds-choice input:checked::before{scale:1} .ds-choice input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}"
+    },
+    {
+      "name": "Invitation Card",
+      "kind": "card",
+      "refersTo": "card-invitation",
+      "description": "Ivory paper with grain shadow and the double blush hairline frame.",
+      "html": "<article class=\"ds-inv\"><p class=\"ds-inv-open\">Budeme se brát!</p><h1 class=\"ds-inv-names\">Anna<span class=\"ds-amp\">&amp;</span>Jiří</h1><p class=\"ds-inv-date\">sobota 12. června</p></article>",
+      "css": ".ds-inv{position:relative;max-width:34rem;padding:clamp(3.25rem,11vw,5rem) clamp(1.75rem,8vw,4rem) clamp(3rem,10vw,4.5rem);background:var(--paper);border-radius:2px;box-shadow:var(--shadow-paper);text-align:center;font-family:var(--font-serif), 'EB Garamond', Georgia, serif;color:var(--ink)} .ds-inv::after{content:'';position:absolute;inset:clamp(.625rem,2.4vw,.875rem);border:1px solid var(--blush-line);box-shadow:inset 0 0 0 4px var(--paper),inset 0 0 0 5px rgb(220 183 174 / .55);pointer-events:none} .ds-inv-open{margin:0;font-style:italic;font-size:clamp(1.375rem,5vw,1.625rem)} .ds-inv-names{margin:1.5rem 0;font-family:var(--font-script), 'Pinyon Script', cursive;font-weight:400;font-size:clamp(2.75rem,12.5vw,4.25rem);line-height:1.12} .ds-amp{display:block;font-family:var(--font-serif), 'EB Garamond', Georgia, serif;font-style:italic;font-size:.42em;color:var(--accent)} .ds-inv-date{margin:0;font-variant-caps:all-small-caps;letter-spacing:.12em;font-size:1.3rem}"
+    },
+    {
+      "name": "Reply Card",
+      "kind": "card",
+      "refersTo": "card-reply",
+      "description": "Blush reply paper with a single hairline frame; hosts the RSVP, recovery, edit and 404.",
+      "html": "<section class=\"ds-reply\"><h2 class=\"ds-reply-title\">Dáš nám vědět?</h2><p class=\"ds-reply-lede\">Zatím jde o předběžné potvrzení.</p><p class=\"ds-note\"><span class=\"ds-runin\">Ubytování</span>Na obě noci máme ubytování rezervované.</p></section>",
+      "css": ".ds-reply{position:relative;max-width:34rem;padding:clamp(2.25rem,8vw,3.5rem) clamp(1.25rem,6.5vw,3rem);background:var(--reply-paper);border-radius:2px;box-shadow:var(--shadow-paper);font-family:var(--font-serif), 'EB Garamond', Georgia, serif;color:var(--ink)} .ds-reply::after{content:'';position:absolute;inset:clamp(.5rem,2vw,.75rem);border:1px solid var(--blush-line);pointer-events:none} .ds-reply-title{margin:0;text-align:center;font-weight:400;font-style:italic;font-size:clamp(1.75rem,6.5vw,2.125rem);line-height:1.2} .ds-reply-lede{margin:.75rem auto 0;text-align:center;color:var(--ink-soft);font-size:1.0625rem} .ds-note{margin:1.75rem 0 0;padding-top:1.5rem;border-top:1px solid var(--blush-line);font-size:1.0625rem} .ds-runin{font-variant-caps:all-small-caps;letter-spacing:.1em;color:var(--accent);margin-right:.35em}"
+    },
+    {
+      "name": "Printed Seal",
+      "kind": "custom",
+      "refersTo": "seal",
+      "description": "Flat printed roundel with the couple's initials at the envelope flap point.",
+      "html": "<span class=\"ds-seal\"><span>AJ</span></span>",
+      "css": ".ds-seal{display:inline-grid;place-items:center;width:4.25rem;aspect-ratio:1;border-radius:50%;background:var(--seal);box-shadow:inset 0 0 0 4px var(--seal),inset 0 0 0 5px rgb(255 247 242 / .7),0 1px 2px rgb(80 50 44 / .22);color:#fff7f2;font-family:var(--font-script), 'Pinyon Script', cursive;font-size:1.375rem;line-height:1} .ds-seal span{translate:0 .08em}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Stationery on the Table",
+    "overview": "Every surface is a piece of paper someone made for you, lying on a soft blush-grey tabletop. Warm ivory cotton card with a fine grain, a blush envelope with a sage-striped liner, a flat printed blush roundel carrying the couple's initials, deep cocoa ink, thin blush hairline frames. Nothing on screen behaves like a website: no navigation, no hero, no sections or card grids. The page is a narrow sheet centred on the table, and content is typeset on it the way a printer would set it: centred, generous margins, true small caps, italic for voice, script reserved for names.\n\nDensity is low and the pace is slow on purpose. The envelope opens in 3D, the card rises from the pocket, and the reply card unfolds beneath it; every other state change is a short fade or line shift. Depth is the physical kind, paper above a table, never interface chrome. The owner's brief rules out dense florals, loud gradients, glassmorphism, confetti, and autoplay sound; the only gradient in the system is a barely visible pool of light on the tabletop.",
+    "keyCharacteristics": [
+      "One narrow sheet (34rem max) centred on a tabletop; no navigation or page chrome.",
+      "Two papers: ivory for the invitation, faint blush for the reply card, both grained and both framed with an inset blush hairline.",
+      "EB Garamond for everything readable, Pinyon Script only for the couple's names and initials.",
+      "One cocoa-rose accent carries every interactive cue.",
+      "Soft, layered, table-cast shadows; no hard offsets, no emboss."
+    ],
+    "rules": [
+      {
+        "name": "The One Ink Accent Rule",
+        "body": "Cocoa Rose is the only colour that means \"you can act here\". If something is not interactive (or the ampersand), it is not Cocoa Rose.",
+        "section": "colors"
+      },
+      {
+        "name": "The Hairline Is Decoration Rule",
+        "body": "Blush Hairline frames and divides; it never carries text or marks a control. Controls use Control Taupe, text uses Cocoa Ink or Soft Cocoa.",
+        "section": "colors"
+      },
+      {
+        "name": "The Script Is For Names Rule",
+        "body": "Pinyon Script sets the couple's names and initials and nothing else. Headings, buttons and labels are Garamond.",
+        "section": "typography"
+      },
+      {
+        "name": "The True Small Caps Rule",
+        "body": "Small capitals come from `font-variant-caps: all-small-caps` with open tracking, never from `text-transform: uppercase`.",
+        "section": "typography"
+      },
+      {
+        "name": "The Italic Is Voice Rule",
+        "body": "Where the couple speaks directly (the opening line, reply titles, the envelope intro, the time), set italic Garamond rather than bolder or larger type.",
+        "section": "typography"
+      },
+      {
+        "name": "The Paper-On-A-Table Rule",
+        "body": "Shadows are warm cocoa, soft and long, cast downward as by room light. No hard offset shadows, no neutral grey shadows, no glass or blur.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Printed Seal Rule",
+        "body": "The seal is a flat printed roundel: solid Pressed Blush with a thin inset near-white ring and a 1px contact shadow. No highlights, gradients or emboss.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** put every new surface on Ivory Paper or Blush Reply Paper with the paper-on-table shadow, grain, and an inset blush hairline frame.",
+      "**Do** keep everything in the single 34rem sheet, centred, with clamp()-based vertical rhythm.",
+      "**Do** use Cocoa Rose for every interactive cue and nothing decorative except the names' ampersand.",
+      "**Do** set labels in true small caps with 0.1–0.14em tracking, and the couple's voice in italic Garamond.",
+      "**Do** draw form fields as a single underline that turns Cocoa Rose on focus.",
+      "**Do** honour reduced motion: every animation must collapse to an instant state change without losing content."
+    ],
+    "donts": [
+      "**Don't** set anything but the couple's names and initials in Pinyon Script.",
+      "**Don't** use Blush Hairline for text or control outlines.",
+      "**Don't** use `text-transform: uppercase`; use small caps.",
+      "**Don't** add hard offset shadows, grey shadows, glassmorphism, emboss or highlights on the seal.",
+      "**Don't** introduce boxed or filled inputs, cards inside cards, navigation bars, or hero sections.",
+      "**Don't** add dense florals, loud gradients, confetti, or autoplay sound (owner's brief)."
+    ]
+  }
+}

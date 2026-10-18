@@ -1,0 +1,892 @@
+/* ------------------------------------------------------------------
+   Palette — provisional, tune here. Text colours are checked for
+   WCAG AA on both paper tones.
+   ------------------------------------------------------------------ */
+:root {
+  --table: #efe6e1;          /* the surface the stationery lies on */
+  --table-light: #f7f1ed;
+  --paper: #fcf8f1;          /* invitation card, warm ivory */
+  --paper-edge: #efe5d6;
+  --reply-paper: #faf0ec;    /* reply card, faint blush */
+  --envelope: #ecd8d1;
+  --envelope-side: #e6cdc5;
+  --envelope-bottom: #efdcd5;
+  --envelope-flap: #e9d2ca;
+  --liner: #d9e1d3;          /* muted sage liner */
+  --liner-stripe: #ccd6c5;
+  --seal: #c48a83;
+  --seal-deep: #a96e68;
+
+  --ink: #3b3230;            /* 11.8:1 on paper */
+  --ink-soft: #66544f;       /* 6.7:1 on paper, 6.4:1 on reply paper */
+  --accent: #985550;         /* 5.3:1 on paper, 5.0:1 on reply paper — links, focus, buttons */
+  --accent-strong: #7f423e;
+  --blush-line: #dcb7ae;     /* decorative rules only */
+  --error: #a3352d;          /* 6.0:1 on reply paper */
+  --control-line: #8f7a74;   /* 3.6:1, input and radio outlines */
+  --success: #4f6b4a;
+
+  --shadow-paper:
+    0 1px 1px rgb(80 50 44 / 0.06),
+    0 6px 14px -6px rgb(80 50 44 / 0.16),
+    0 28px 60px -24px rgb(80 50 44 / 0.28);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Fine paper grain: an inline SVG noise tile, ~1 KB. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .2 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--table);
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  color: var(--ink);
+  background:
+    radial-gradient(120% 70% at 50% 0%, var(--table-light) 0%, transparent 70%),
+    var(--table);
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #ebc9c1;
+  color: var(--ink);
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+input {
+  caret-color: var(--accent);
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+a:hover {
+  color: var(--accent-strong);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------
+   Shared stationery
+   ------------------------------------------------------------------ */
+.paper {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--paper);
+  box-shadow: var(--shadow-paper);
+  border-radius: 2px;
+}
+.paper::before {
+  /* grain */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--grain);
+  opacity: 0.16;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.page {
+  min-height: 100svh;
+  padding: clamp(2rem, 7vw, 5rem) 1rem clamp(3rem, 8vw, 6rem);
+}
+
+.sheet {
+  width: min(100%, 34rem);
+  margin-inline: auto;
+}
+
+/* ------------------------------------------------------------------
+   Envelope
+   ------------------------------------------------------------------ */
+.envelope-stage {
+  min-height: calc(100svh - 2 * clamp(2rem, 7vw, 5rem));
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: clamp(1.75rem, 5vw, 2.5rem);
+  text-align: center;
+}
+
+.envelope-intro {
+  margin: 0;
+  font-style: italic;
+  font-size: clamp(1.375rem, 4.6vw, 1.75rem);
+  line-height: 1.3;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.envelope-hint {
+  margin: 0;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.14em;
+  font-size: 1.0625rem;
+  color: var(--ink-soft);
+}
+
+.envelope {
+  --w: min(86vw, 440px);
+  position: relative;
+  width: var(--w);
+  aspect-ratio: 10 / 7;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1400px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform 500ms var(--ease-out);
+}
+.envelope:focus-visible {
+  outline-offset: 10px;
+  border-radius: 6px;
+}
+@media (hover: hover) {
+  .envelope:not([aria-disabled="true"]):hover {
+    transform: translateY(-3px);
+  }
+  .envelope:not([aria-disabled="true"]):hover .env-flap {
+    transform: rotateX(-14deg);
+  }
+}
+.envelope[aria-disabled="true"] {
+  cursor: default;
+}
+
+.env-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: #e2c9c1;
+  box-shadow: var(--shadow-paper);
+}
+
+.env-card {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 6%;
+  height: 86%;
+  z-index: 1;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  padding-top: 7%;
+  text-align: center;
+  overflow: hidden;
+  color: var(--ink);
+}
+.env-card::after {
+  content: "";
+  position: absolute;
+  inset: 5px 5px 0;
+  border: 1px solid var(--blush-line);
+  border-bottom: 0;
+  box-shadow: inset 0 0 0 3px var(--paper), inset 0 0 0 4px rgb(220 183 174 / 0.55);
+  pointer-events: none;
+}
+.env-card .mini-opening {
+  font-style: italic;
+  font-size: clamp(0.8125rem, 3.2vw, 1rem);
+  color: var(--ink);
+}
+.env-card .mini-names {
+  display: grid;
+  font-family: var(--font-script), cursive;
+  font-size: clamp(1.375rem, 6.2vw, 2rem);
+  line-height: 1.08;
+  margin-top: 0.3em;
+}
+.env-card .mini-names .amp {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 0.42em;
+  line-height: 1.2;
+  color: var(--accent);
+}
+
+.env-pocket {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 -1px 1.5px rgb(80 50 44 / 0.10));
+}
+
+.env-flap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 60%;
+  z-index: 3;
+  transform-origin: 50% 0;
+  transform-style: preserve-3d;
+  transition: transform 450ms var(--ease-out);
+}
+.env-flap-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.env-flap-face svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.env-flap-back {
+  transform: rotateX(180deg);
+}
+
+.env-seal {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: clamp(3.5rem, 15vw, 4.25rem);
+  aspect-ratio: 1;
+  translate: -50% -58%;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--seal);
+  box-shadow:
+    inset 0 0 0 4px var(--seal),
+    inset 0 0 0 5px rgb(255 247 242 / 0.7),
+    0 1px 2px rgb(80 50 44 / 0.22);
+  color: #fff7f2;
+  font-family: var(--font-script), cursive;
+  font-size: clamp(1.125rem, 5vw, 1.375rem);
+  line-height: 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.env-seal.is-long {
+  font-size: clamp(0.75rem, 3.2vw, 0.875rem);
+}
+.env-seal span {
+  white-space: nowrap;
+  translate: 0 0.08em;
+}
+
+/* Opening choreography (~1.6 s total, see InvitationExperience) */
+.is-opening .env-seal {
+  animation: seal-out 200ms var(--ease-out) forwards;
+}
+.is-opening .env-flap,
+.is-opening .env-card {
+  will-change: transform;
+}
+.is-opening .env-flap {
+  animation: flap-open 480ms var(--ease-in-out) forwards;
+}
+.is-opening .env-card {
+  animation: card-rise 620ms var(--ease-out) 320ms forwards;
+}
+.is-settling .env-flap {
+  transform: rotateX(180deg);
+  z-index: 0;
+}
+.is-settling .env-seal {
+  opacity: 0;
+}
+.is-settling .env-card {
+  transform: translateY(-56%);
+}
+.is-settling .envelope {
+  animation: envelope-away 320ms var(--ease-in-out) forwards;
+}
+.is-settling .envelope-intro,
+.is-settling .envelope-hint,
+.is-opening .envelope-hint {
+  transition: opacity 240ms ease;
+  opacity: 0;
+}
+
+@keyframes seal-out {
+  to {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+@keyframes flap-open {
+  0% {
+    transform: rotateX(0deg);
+    z-index: 3;
+  }
+  49% {
+    z-index: 3;
+  }
+  50% {
+    z-index: 0;
+  }
+  100% {
+    transform: rotateX(180deg);
+    z-index: 0;
+  }
+}
+@keyframes card-rise {
+  to {
+    transform: translateY(-56%);
+  }
+}
+@keyframes envelope-away {
+  to {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Invitation card
+   ------------------------------------------------------------------ */
+.invitation {
+  padding: clamp(3.25rem, 11vw, 5rem) clamp(1.75rem, 8vw, 4rem) clamp(3rem, 10vw, 4.5rem);
+  text-align: center;
+}
+.invitation::after {
+  /* double hairline frame */
+  content: "";
+  position: absolute;
+  inset: clamp(0.625rem, 2.4vw, 0.875rem);
+  border: 1px solid var(--blush-line);
+  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px rgb(220 183 174 / 0.55);
+  pointer-events: none;
+}
+.invitation:focus {
+  outline: none;
+}
+.invitation.is-entering {
+  animation: card-arrive 620ms var(--ease-out) both;
+}
+@keyframes card-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.975);
+  }
+}
+
+.inv-opening {
+  margin: 0;
+  font-style: italic;
+  font-size: clamp(1.375rem, 5vw, 1.625rem);
+  color: var(--ink);
+}
+
+.inv-names {
+  margin: clamp(1.25rem, 4vw, 1.75rem) 0 clamp(1.25rem, 4vw, 1.75rem);
+  font-family: var(--font-script), cursive;
+  font-weight: 400;
+  font-size: clamp(2.75rem, 12.5vw, 4.25rem);
+  line-height: 1.12;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.inv-names .amp {
+  display: block;
+  margin: 0.08em 0 0.02em;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 0.42em;
+  line-height: 1;
+  color: var(--accent);
+}
+.inv-names .name {
+  display: block;
+}
+
+.inv-invite {
+  margin: 0 auto;
+  max-width: 22ch;
+  font-size: clamp(1.1875rem, 4.4vw, 1.375rem);
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+.ornament {
+  display: block;
+  width: 9rem;
+  height: 1rem;
+  margin: clamp(1.75rem, 6vw, 2.5rem) auto;
+  color: var(--blush-line);
+}
+
+.inv-details {
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.inv-details dd {
+  margin: 0;
+}
+.inv-date {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  font-size: clamp(1.25rem, 4.8vw, 1.4375rem);
+  color: var(--ink);
+}
+.inv-time {
+  font-style: italic;
+  font-size: 1.1875rem;
+  color: var(--ink-soft);
+}
+.inv-venue {
+  margin-top: 0.85rem !important;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.1em;
+  font-size: 1.1875rem;
+}
+.inv-address {
+  font-size: 1.0625rem;
+  color: var(--ink-soft);
+}
+
+.respond {
+  display: grid;
+  justify-items: center;
+  margin-top: clamp(2rem, 6vw, 2.75rem);
+}
+.respond.is-entering {
+  animation: fade-in 500ms ease 450ms both;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Buttons
+   ------------------------------------------------------------------ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 0.7rem 2rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 1.1875rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms var(--ease-out);
+  touch-action: manipulation;
+}
+.btn:hover {
+  background: rgb(152 85 80 / 0.07);
+  color: var(--accent-strong);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fffaf6;
+  box-shadow: 0 1px 1px rgb(80 50 44 / 0.12), 0 8px 18px -10px rgb(127 66 62 / 0.6);
+}
+.btn-primary:hover {
+  background: var(--accent-strong);
+  color: #fffaf6;
+}
+.btn[disabled],
+.btn[aria-disabled="true"] {
+  cursor: progress;
+  opacity: 0.75;
+}
+.btn-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  min-height: 2.75rem;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.spinner {
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 800ms linear infinite;
+}
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Reply card (RSVP)
+   ------------------------------------------------------------------ */
+.reply::after {
+  content: "";
+  position: absolute;
+  inset: clamp(0.5rem, 2vw, 0.75rem);
+  border: 1px solid var(--blush-line);
+  pointer-events: none;
+}
+.reply {
+  margin-top: clamp(2.5rem, 8vw, 3.5rem);
+  scroll-margin-top: 1.5rem;
+  background-color: var(--reply-paper);
+  padding: clamp(2.25rem, 8vw, 3.5rem) clamp(1.25rem, 6.5vw, 3rem) clamp(2.5rem, 8vw, 3.5rem);
+}
+.reply.is-entering {
+  animation: reply-unfold 560ms var(--ease-out) both;
+}
+@keyframes reply-unfold {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+.reply-standalone {
+  margin-top: 0;
+}
+
+.reply-title {
+  margin: 0;
+  text-align: center;
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.75rem, 6.5vw, 2.125rem);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.reply-title:focus {
+  outline: none;
+}
+.reply-lede {
+  margin: 0.75rem auto 0;
+  max-width: 30rem;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 1.0625rem;
+  text-wrap: pretty;
+}
+
+.notes {
+  margin: clamp(1.75rem, 6vw, 2.25rem) 0 0;
+  padding: 1.5rem 0 0.25rem;
+  border-top: 1px solid var(--blush-line);
+  display: grid;
+  gap: 1rem;
+}
+.notes p {
+  margin: 0;
+  font-size: 1.0625rem;
+  text-wrap: pretty;
+}
+.notes .runin {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-right: 0.35em;
+}
+
+.form {
+  margin-top: 1.75rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--blush-line);
+  display: grid;
+  gap: 1.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+.field-label,
+.choices legend {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 0;
+}
+.field-help {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+.input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.1rem 0.3rem;
+  border: 0;
+  border-bottom: 1px solid var(--control-line);
+  border-radius: 0;
+  background: transparent;
+  font-size: 1.1875rem;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.input:hover {
+  border-bottom-color: var(--ink-soft);
+}
+.input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+  box-shadow: 0 1px 0 0 var(--accent);
+}
+.input:focus-visible {
+  outline: none;
+}
+.input[aria-invalid="true"] {
+  border-bottom-color: var(--error);
+}
+.input[readonly] {
+  color: var(--ink-soft);
+  border-bottom-style: dashed;
+}
+
+.field-error {
+  margin: 0;
+  display: flex;
+  gap: 0.45rem;
+  align-items: baseline;
+  color: var(--error);
+  font-size: 1rem;
+}
+.field-error svg {
+  flex: none;
+  width: 0.9em;
+  height: 0.9em;
+  translate: 0 0.1em;
+}
+
+.choices {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+.choices legend {
+  margin-bottom: 0.4rem;
+}
+.choice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 3rem;
+  padding: 0.3rem 0.5rem 0.3rem 0.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+.choice:hover {
+  background: rgb(152 85 80 / 0.05);
+}
+.choice input {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  width: 1.375rem;
+  height: 1.375rem;
+  margin: 0;
+  border: 1.5px solid var(--control-line);
+  border-radius: 50%;
+  background: var(--paper);
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition: border-color 160ms ease;
+}
+.choice input::before {
+  content: "";
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--accent);
+  scale: 0;
+  transition: scale 180ms var(--ease-out);
+}
+.choice input:checked {
+  border-color: var(--accent);
+}
+.choice input:checked::before {
+  scale: 1;
+}
+.choice input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.choices[aria-invalid="true"] .choice input {
+  border-color: var(--error);
+}
+.choice-text {
+  font-size: 1.125rem;
+  line-height: 1.35;
+}
+
+.accommodation {
+  padding: 0;
+}
+.accommodation legend {
+  margin-bottom: 0.5rem;
+}
+.accommodation .choice-list {
+  display: grid;
+  gap: 0.15rem;
+  padding-left: 0.85rem;
+  border-left: 1px solid var(--blush-line);
+}
+.accommodation.is-entering {
+  animation: fade-down 360ms var(--ease-out) both;
+}
+@keyframes fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+.form-actions {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.form-status {
+  margin: 0;
+  text-align: center;
+  font-size: 1.0625rem;
+}
+.form-status:empty {
+  display: none;
+}
+.form-status.is-error {
+  color: var(--error);
+}
+.form-status.is-success {
+  color: var(--success);
+}
+
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.done {
+  display: grid;
+  gap: 1rem;
+  text-align: center;
+}
+.done p {
+  margin: 0;
+  text-wrap: pretty;
+}
+.reply .done-after-form {
+  margin-top: 1.75rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--blush-line);
+}
+.done .soft {
+  color: var(--ink-soft);
+  font-size: 1.0625rem;
+}
+.done-mark {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 0.25rem;
+  color: var(--accent);
+}
+
+.meta-line {
+  margin: 0 0 1.5rem;
+  text-align: center;
+  font-family: var(--font-script), cursive;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.footnote {
+  margin: 1.75rem auto 0;
+  max-width: 30rem;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion: everything still works, just without travel.
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
