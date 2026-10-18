@@ -31,8 +31,8 @@
     0 6px 14px -6px rgb(74 58 38 / 0.16),
     0 28px 60px -24px rgb(74 58 38 / 0.28);
 
-  /* side space between the screen edge (and its green frame) and the paper */
-  --gutter: clamp(1.75rem, 6vw, 2.5rem);
+  /* side space between the screen edge and the paper */
+  --gutter: 1rem;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -153,7 +153,7 @@ a:hover {
 }
 /* the open card sits a little higher than the envelope did */
 .page:has(.sheet) {
-  --pad-top: clamp(2.75rem, 6vw, 3.5rem);
+  --pad-top: clamp(1rem, 3.5vw, 2.25rem);
 }
 
 /* ------------------------------------------------------------------
@@ -1166,100 +1166,6 @@ a:hover {
   to {
     transform: rotate(2.5deg) translate(-1.5%, 1%);
   }
-}
-
-/* ------------------------------------------------------------------
-   Screen frame: a double hairline with eucalyptus sprigs in the corners.
-   ------------------------------------------------------------------ */
-.screen-frame {
-  --frame-inset: clamp(8px, 1.6vw, 18px);
-  /* garland: soft eucalyptus greens, ivory-blush roses */
-  --leaf-light: rgb(160 188 146 / 0.5);
-  --leaf-dark: rgb(118 154 110 / 0.5);
-  --petal: #fbf4ee;
-  --petal-mid: #f4e2d8;
-  --petal-deep: #ecd0c4;
-  --petal-line: rgb(176 136 118 / 0.55);
-  --pollen: #d7b77a;
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  color: rgb(82 122 80 / 0.68);
-}
-.screen-frame::before,
-.screen-frame::after {
-  content: "";
-  position: absolute;
-  inset: var(--frame-inset);
-  border: 1px solid rgb(184 156 110 / 0.38);
-}
-.screen-frame::after {
-  inset: calc(var(--frame-inset) + 4px);
-  border-color: rgb(184 156 110 / 0.2);
-}
-.frame-corner {
-  position: absolute;
-  width: clamp(190px, 34vw, 420px);
-  aspect-ratio: 1;
-}
-/* the corners on the other diagonal are a little shorter, so the frame isn't rigid */
-.frame-tr,
-.frame-bl {
-  width: clamp(150px, 26vw, 330px);
-}
-/* the sprigs grow straight out of the screen's edges */
-.frame-tl {
-  top: 0;
-  left: 0;
-}
-.frame-tr {
-  top: 0;
-  right: 0;
-  transform: scaleX(-1);
-}
-.frame-bl {
-  bottom: 0;
-  left: 0;
-  transform: scaleY(-1);
-}
-.frame-br {
-  right: 0;
-  bottom: 0;
-  transform: rotate(180deg);
-}
-.frame-sprig {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-/* Full length around the closed envelope; once it starts opening (or on any page
-   without it) the stems draw back to their corners and the outer leaves fold away. */
-.frame-stem {
-  stroke-dasharray: 1;
-  stroke-dashoffset: var(--short);
-  transition: stroke-dashoffset 1100ms var(--ease-in-out) 120ms;
-}
-.frame-leaf {
-  transform-box: view-box;
-  transform-origin: 0 0;
-}
-.frame-leaf.is-tail {
-  opacity: 0;
-  transform: scale(0.2);
-  transition:
-    transform 520ms var(--ease-in-out) var(--d),
-    opacity 420ms ease var(--d);
-}
-body:has(.envelope-stage.is-closed) .frame-stem {
-  stroke-dashoffset: 0;
-}
-body:has(.envelope-stage.is-closed) .frame-leaf.is-tail {
-  opacity: 1;
-  transform: none;
 }
 
 /* ------------------------------------------------------------------

@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { EB_Garamond, Pinyon_Script } from "next/font/google";
 import { siteName } from "@/content/event";
-import { ScreenFrame } from "@/components/ScreenFrame";
 import { TableLight } from "@/components/TableLight";
 import "./globals.css";
 
@@ -36,7 +35,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="cs" className={`${garamond.variable} ${script.variable}`}>
       <body>
         <TableLight />
-        <ScreenFrame />
         {children}
       </body>
     </html>
