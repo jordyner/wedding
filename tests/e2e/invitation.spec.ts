@@ -67,7 +67,7 @@ test.describe("envelope", () => {
   test("survives repeated rapid clicks", async ({ page }) => {
     await page.goto("/pozvanka");
     const envelope = page.getByRole("button", { name: "Otevřít obálku s pozvánkou" });
-    await envelope.click();
+    await envelope.click({ force: true });
     for (let i = 0; i < 5; i++) await envelope.click({ force: true, timeout: 500 }).catch(() => {});
     await expect(page.getByTestId("invitation")).toBeVisible();
     await expect(page.getByTestId("invitation")).toHaveCount(1);
@@ -79,7 +79,7 @@ test.describe("envelope", () => {
   test("reduced motion reveals the card immediately", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/pozvanka");
-    await page.getByRole("button", { name: "Otevřít obálku s pozvánkou" }).click();
+    await page.getByRole("button", { name: "Otevřít obálku s pozvánkou" }).click({ force: true });
     // No animation phases: the card is there on the very next frame.
     await expect(page.getByTestId("invitation")).toBeVisible({ timeout: 150 });
     await expect(page.locator("[data-phase=opening]")).toHaveCount(0);
@@ -114,6 +114,8 @@ test.describe("RSVP reveal", () => {
     await expect(page.getByRole("heading", { name: "Dáš nám vědět?" })).toBeFocused();
     await expect(page.getByTestId("invitation")).toBeVisible();
 
+    // The reply card slides out from behind the invitation; measure once it has settled.
+    await reply.evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
     const card = (await page.getByTestId("invitation").boundingBox())!;
     const replyBox = (await reply.boundingBox())!;
     expect(replyBox.y).toBeGreaterThan(card.y + card.height);

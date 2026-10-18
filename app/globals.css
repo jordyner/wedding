@@ -133,6 +133,8 @@ a:hover {
 }
 
 .page {
+  position: relative;
+  z-index: 1;
   min-height: 100svh;
   padding: clamp(2rem, 7vw, 5rem) 1rem clamp(3rem, 8vw, 6rem);
 }
@@ -171,6 +173,21 @@ a:hover {
   color: var(--ink-soft);
 }
 
+.envelope-float {
+  animation: envelope-float 5.5s ease-in-out infinite;
+}
+.envelope-stage:not(.is-closed) .envelope-float {
+  animation-play-state: paused;
+}
+.envelope-tilt {
+  perspective: 900px;
+}
+@keyframes envelope-float {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 .envelope {
   --w: min(86vw, 440px);
   position: relative;
@@ -183,19 +200,33 @@ a:hover {
   perspective: 1400px;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  transition: transform 500ms var(--ease-out);
+  transform: translateY(var(--lift, 0px)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 600ms var(--ease-out);
+}
+.envelope-tilt[data-tilting] .envelope {
+  transition-duration: 140ms;
+}
+.envelope:active:not([aria-disabled="true"]) {
+  --lift: 2px;
 }
 .envelope:focus-visible {
   outline-offset: 10px;
   border-radius: 6px;
 }
+/* Hover or keyboard focus: the flap lifts a little and the card peeks out. */
 @media (hover: hover) {
   .envelope:not([aria-disabled="true"]):hover {
-    transform: translateY(-3px);
+    --lift: -4px;
   }
   .envelope:not([aria-disabled="true"]):hover .env-flap {
-    transform: rotateX(-14deg);
+    transform: rotateX(-16deg);
   }
+  .envelope:not([aria-disabled="true"]):hover .env-card {
+    transform: translateY(-9%);
+  }
+}
+.envelope:not([aria-disabled="true"]):focus-visible .env-card {
+  transform: translateY(-9%);
 }
 .envelope[aria-disabled="true"] {
   cursor: default;
@@ -223,6 +254,7 @@ a:hover {
   text-align: center;
   overflow: hidden;
   color: var(--ink);
+  transition: transform 500ms var(--ease-out);
 }
 .env-card::after {
   content: "";
@@ -297,14 +329,6 @@ a:hover {
   width: clamp(3.5rem, 15vw, 4.25rem);
   aspect-ratio: 1;
   translate: -50% -58%;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--seal);
-  box-shadow:
-    inset 0 0 0 4px var(--seal),
-    inset 0 0 0 5px rgb(255 247 242 / 0.7),
-    0 1px 2px rgb(80 50 44 / 0.22);
   color: #fff7f2;
   font-family: var(--font-script), cursive;
   font-size: clamp(1.125rem, 5vw, 1.375rem);
@@ -315,24 +339,53 @@ a:hover {
 .env-seal.is-long {
   font-size: clamp(0.75rem, 3.2vw, 0.875rem);
 }
-.env-seal span {
+.env-seal::before {
+  /* contact shadow on the flap */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgb(80 50 44 / 0.22);
+}
+.seal-half {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--seal);
+  box-shadow:
+    inset 0 0 0 4px var(--seal),
+    inset 0 0 0 5px rgb(255 247 242 / 0.7);
+}
+.seal-mono {
   white-space: nowrap;
   translate: 0 0.08em;
 }
 
-/* Opening choreography (~1.6 s total, see InvitationExperience) */
+/* Opening choreography (~1.6 s, see InvitationExperience):
+   seal is pressed and cracks → flap lifts → card rises → envelope settles away. */
 .is-opening .env-seal {
-  animation: seal-out 200ms var(--ease-out) forwards;
+  animation: seal-press 160ms ease-out;
+}
+.is-opening .env-seal::before {
+  animation: fade-out 160ms ease 100ms forwards;
+}
+.is-opening .seal-left {
+  animation: crack-left 520ms var(--ease-out) 100ms forwards;
+}
+.is-opening .seal-right {
+  animation: crack-right 520ms var(--ease-out) 100ms forwards;
 }
 .is-opening .env-flap,
 .is-opening .env-card {
   will-change: transform;
 }
 .is-opening .env-flap {
-  animation: flap-open 480ms var(--ease-in-out) forwards;
+  animation: flap-open 500ms var(--ease-in-out) 300ms both;
 }
 .is-opening .env-card {
-  animation: card-rise 620ms var(--ease-out) 320ms forwards;
+  animation: card-rise 600ms var(--ease-out) 620ms both;
 }
 .is-settling .env-flap {
   transform: rotateX(180deg);
@@ -354,10 +407,34 @@ a:hover {
   opacity: 0;
 }
 
-@keyframes seal-out {
+@keyframes seal-press {
+  50% {
+    scale: 0.9;
+  }
+}
+@keyframes crack-left {
+  25% {
+    transform: translate(-5%, 1%) rotate(-5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-26%, 40%) rotate(-26deg);
+    opacity: 0;
+  }
+}
+@keyframes crack-right {
+  25% {
+    transform: translate(5%, 2%) rotate(4deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(24%, 46%) rotate(22deg);
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
   to {
     opacity: 0;
-    scale: 0.9;
   }
 }
 @keyframes flap-open {
@@ -377,6 +454,9 @@ a:hover {
   }
 }
 @keyframes card-rise {
+  from {
+    transform: translateY(0);
+  }
   to {
     transform: translateY(-56%);
   }
@@ -406,6 +486,106 @@ a:hover {
 }
 .invitation:focus {
   outline: none;
+}
+.card-tilt {
+  position: relative;
+  z-index: 2;
+  perspective: 1600px;
+}
+.card-tilt .invitation {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 700ms var(--ease-out);
+}
+.card-tilt[data-tilting] .invitation {
+  transition-duration: 160ms;
+}
+.sheen {
+  /* light sliding over the paper as the card tilts */
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(55% 40% at var(--gx, 50%) var(--gy, 0%), rgb(255 255 255 / 0.5), transparent 70%);
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.card-tilt[data-tilting] .sheen {
+  opacity: 1;
+}
+
+/* Written in ink: names are drawn left to right, then the rest settles in. */
+.is-writing .inv-opening {
+  animation: rise-in 500ms var(--ease-out) 100ms both;
+}
+.is-writing .inv-names .name {
+  -webkit-mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  mask-image: linear-gradient(90deg, #000 45%, transparent 55%);
+  -webkit-mask-size: 230% 100%;
+  mask-size: 230% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  animation: ink-write 680ms cubic-bezier(0.45, 0.05, 0.35, 1) both;
+}
+.is-writing .name-1 {
+  animation-delay: 250ms;
+}
+.is-writing .name-2 {
+  animation-delay: 820ms;
+}
+.is-writing .inv-names .amp {
+  animation: rise-in 400ms ease 700ms both;
+}
+.is-writing .inv-invite {
+  animation: rise-in 600ms var(--ease-out) 1300ms both;
+}
+.ornament .draw {
+  stroke-dasharray: 1;
+}
+.is-writing .ornament .draw {
+  animation: draw-line 600ms var(--ease-out) 1450ms both;
+}
+.is-writing .ornament circle {
+  animation: fade-in 300ms ease 1800ms both;
+}
+.is-writing .inv-details dd {
+  animation: rise-in 600ms var(--ease-out) both;
+}
+.is-writing .inv-details dd:nth-of-type(1) {
+  animation-delay: 1550ms;
+}
+.is-writing .inv-details dd:nth-of-type(2) {
+  animation-delay: 1630ms;
+}
+.is-writing .inv-details dd:nth-of-type(3) {
+  animation-delay: 1710ms;
+}
+.is-writing .inv-details dd:nth-of-type(4) {
+  animation-delay: 1790ms;
+}
+@keyframes ink-write {
+  from {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  to {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+}
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 .invitation.is-entering {
   animation: card-arrive 620ms var(--ease-out) both;
@@ -444,6 +624,10 @@ a:hover {
 }
 .inv-names .name {
   display: block;
+  width: fit-content;
+  margin-inline: auto;
+  /* room for the script's swashes inside the ink mask */
+  padding-inline: 0.3em;
 }
 
 .inv-invite {
@@ -498,7 +682,7 @@ a:hover {
   margin-top: clamp(2rem, 6vw, 2.75rem);
 }
 .respond.is-entering {
-  animation: fade-in 500ms ease 450ms both;
+  animation: rise-in 500ms var(--ease-out) 1900ms both;
 }
 @keyframes fade-in {
   from {
@@ -595,12 +779,17 @@ a:hover {
   padding: clamp(2.25rem, 8vw, 3.5rem) clamp(1.25rem, 6.5vw, 3rem) clamp(2.5rem, 8vw, 3.5rem);
 }
 .reply.is-entering {
-  animation: reply-unfold 560ms var(--ease-out) both;
+  position: relative;
+  z-index: 1;
+  animation: reply-unfold 820ms var(--ease-out) both;
 }
 @keyframes reply-unfold {
   from {
     opacity: 0;
-    transform: translateY(-14px);
+    transform: translateY(-38%) scale(0.97);
+  }
+  30% {
+    opacity: 1;
   }
 }
 .reply-standalone {
@@ -763,7 +952,7 @@ a:hover {
   border-radius: 50%;
   background: var(--accent);
   scale: 0;
-  transition: scale 180ms var(--ease-out);
+  transition: scale 240ms var(--ease-out);
 }
 .choice input:checked {
   border-color: var(--accent);
@@ -878,6 +1067,75 @@ a:hover {
 }
 
 /* ------------------------------------------------------------------
+   Postmark pressed onto the reply card after sending
+   ------------------------------------------------------------------ */
+.postmark {
+  width: 7.5rem;
+  height: 7.5rem;
+  margin: 0 auto 0.25rem;
+  color: var(--accent);
+  opacity: 0.88;
+  rotate: -9deg;
+  animation: stamp 520ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+}
+.postmark text {
+  font-family: var(--font-serif), serif;
+  fill: currentColor;
+}
+.postmark-ring {
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+}
+.postmark-date {
+  font-size: 15px;
+}
+.postmark-year {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+@keyframes stamp {
+  from {
+    opacity: 0;
+    scale: 1.8;
+    rotate: -2deg;
+  }
+  60% {
+    opacity: 0.95;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Morning light: leaf shadows drifting across the table
+   ------------------------------------------------------------------ */
+.table-light {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  color: rgb(92 70 58);
+}
+.table-light svg {
+  position: absolute;
+  top: -14vh;
+  right: -20vw;
+  width: max(72vw, 520px);
+  opacity: 0.085;
+  filter: blur(9px);
+  transform-origin: 85% 0%;
+  animation: leaves-sway 13s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes leaves-sway {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(2.5deg) translate(-1.5%, 1%);
+  }
+}
+
+/* ------------------------------------------------------------------
    Reduced motion: everything still works, just without travel.
    ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
@@ -886,6 +1144,7 @@ a:hover {
   *::after {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
     scroll-behavior: auto !important;
   }

@@ -27,9 +27,11 @@ export async function freshClient(page: Page) {
 }
 const rnd = () => Math.floor(Math.random() * 250) + 1;
 
+// The closed envelope floats gently, so Playwright would wait forever for it to be
+// "stable"; force skips only that check (the click still lands on the envelope).
 export async function openInvitation(page: Page) {
   await page.goto("/pozvanka");
-  await page.getByRole("button", { name: "Otevřít obálku s pozvánkou" }).click();
+  await page.getByRole("button", { name: "Otevřít obálku s pozvánkou" }).click({ force: true });
   await expect(page.getByTestId("invitation")).toBeVisible();
 }
 

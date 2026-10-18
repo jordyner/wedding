@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { EB_Garamond, Pinyon_Script } from "next/font/google";
 import { siteName } from "@/content/event";
+import { TableLight } from "@/components/TableLight";
 import "./globals.css";
 
 // Both faces carry full Czech diacritics (latin-ext). Self-hosted by Next at build time.
@@ -32,7 +33,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="cs" className={`${garamond.variable} ${script.variable}`}>
-      <body>{children}</body>
+      <body>
+        <TableLight />
+        {children}
+      </body>
     </html>
   );
 }

@@ -7,21 +7,21 @@
  */
 export const event = {
   couple: {
-    first: "[Jméno]",
-    second: "[Jméno]",
+    first: "Eva",
+    second: "Jiří",
     /** Initials on the envelope seal, e.g. ["A", "J"]. */
-    initials: ["[A]", "[J]"],
+    initials: ["E", "J"],
   },
 
   /** Shown on the card in small caps, e.g. "sobota 12. června 2027". */
-  date: "[den a datum svatby]",
+  date: "sobota 22. května 2027",
   /** e.g. "ve 14 hodin" */
   time: "[čas obřadu]",
   venue: {
     /** e.g. "Zámek Loučeň" */
-    name: "[místo obřadu]",
+    name: "Pernek",
     /** Optional second line (town or address). Use "" to hide it. */
-    address: "[obec / adresa]",
+    address: "",
   },
 
   /** The two accommodation nights, written as they should read on the form. */

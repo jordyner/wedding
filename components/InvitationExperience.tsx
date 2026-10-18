@@ -4,12 +4,15 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { event } from "@/content/event";
 import { Envelope } from "./Envelope";
 import { RsvpForm } from "./RsvpForm";
+import { useTilt } from "./useTilt";
 
 type Phase = "closed" | "opening" | "settling" | "open";
 
 // Matches the keyframes in globals.css.
-const OPENING_MS = 960;
+const OPENING_MS = 1240;
 const SETTLING_MS = 320;
+/** How long the card's written-in-ink sequence runs before the card becomes interactive paper. */
+const WRITING_MS = 2500;
 
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -22,8 +25,10 @@ function prefersReducedMotion() {
 export function InvitationExperience({ card, notes }: { card: ReactNode; notes: ReactNode }) {
   const [phase, setPhase] = useState<Phase>("closed");
   const [animate, setAnimate] = useState(true);
+  const [writing, setWriting] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
   const cardRef = useRef<HTMLElement>(null);
+  const tiltRef = useTilt<HTMLDivElement>(3, phase === "open" && !writing);
   const replyTitleRef = useRef<HTMLHeadingElement>(null);
   const replyRef = useRef<HTMLElement>(null);
   const timers = useRef<number[]>([]);
@@ -40,7 +45,11 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
     setPhase("opening");
     timers.current.push(
       window.setTimeout(() => setPhase("settling"), OPENING_MS),
-      window.setTimeout(() => setPhase("open"), OPENING_MS + SETTLING_MS),
+      window.setTimeout(() => {
+        setWriting(true);
+        setPhase("open");
+      }, OPENING_MS + SETTLING_MS),
+      window.setTimeout(() => setWriting(false), OPENING_MS + SETTLING_MS + WRITING_MS),
     );
   }
 
@@ -70,15 +79,18 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
 
   return (
     <div className="sheet" data-phase="open">
-      <article
-        ref={cardRef}
-        className={`paper invitation${animate ? " is-entering" : ""}`}
-        aria-labelledby="invitation-title"
-        tabIndex={-1}
-        data-testid="invitation"
-      >
-        {card}
-      </article>
+      <div className="card-tilt" ref={tiltRef}>
+        <article
+          ref={cardRef}
+          className={`paper invitation${animate ? " is-entering" : ""}${writing ? " is-writing" : ""}`}
+          aria-labelledby="invitation-title"
+          tabIndex={-1}
+          data-testid="invitation"
+        >
+          {card}
+          <span className="sheen" aria-hidden="true" />
+        </article>
+      </div>
 
       {!replyOpen ? (
         <div className={`respond${animate ? " is-entering" : ""}`}>

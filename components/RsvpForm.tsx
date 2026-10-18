@@ -380,6 +380,33 @@ export function RsvpForm({ mode, titleId }: { mode: Mode; titleId?: string }) {
   );
 }
 
+/** An inked postmark pressed onto the reply card once the answer is saved. */
+function Postmark() {
+  const pathId = useId();
+  const now = new Date();
+  return (
+    <svg className="postmark" viewBox="0 0 120 120" aria-hidden="true">
+      <defs>
+        <path id={pathId} d="M60 60 m-45 0 a45 45 0 1 1 90 0 a45 45 0 1 1 -90 0" />
+      </defs>
+      <circle cx="60" cy="60" r="57" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" strokeWidth="0.6" />
+      <circle cx="60" cy="60" r="33" fill="none" stroke="currentColor" strokeWidth="0.8" />
+      <text className="postmark-ring">
+        <textPath href={`#${pathId}`} textLength="276" lengthAdjust="spacing">
+          ODPOVĚĎ PŘIJATA · DĚKUJEME ·
+        </textPath>
+      </text>
+      <text className="postmark-date" x="60" y="58" textAnchor="middle">
+        {now.getDate()}. {now.getMonth() + 1}.
+      </text>
+      <text className="postmark-year" x="60" y="75" textAnchor="middle">
+        {now.getFullYear()}
+      </text>
+    </svg>
+  );
+}
+
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
   return (
@@ -445,10 +472,7 @@ function Done({
 
   return (
     <div className="done done-after-form" data-testid="rsvp-done" data-outcome={`${outcome.kind}:${outcome.email}`}>
-      <svg className="done-mark" viewBox="0 0 48 48" aria-hidden="true">
-        <circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" strokeWidth="1" />
-        <path d="M15 24.5l6 6 12-13" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+      <Postmark />
       <h2 className="reply-title" ref={headingRef} tabIndex={-1} id={titleId ? `${titleId}-done` : undefined}>
         {heading}
       </h2>
