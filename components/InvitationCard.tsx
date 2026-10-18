@@ -42,8 +42,8 @@ export function InvitationCard({ decorative = false }: { decorative?: boolean })
       <Dl className="inv-details">
         {dt("Datum")}
         <Dd className="inv-detail inv-date">{event.date}</Dd>
-        {dt("Čas")}
-        <Dd className="inv-detail inv-time">{event.time}</Dd>
+        {event.time ? dt("Čas") : null}
+        {event.time ? <Dd className="inv-detail inv-time">{event.time}</Dd> : null}
         {dt("Místo")}
         <Dd className="inv-detail inv-venue">{event.venue.name}</Dd>
         {event.venue.address ? <Dd className="inv-detail inv-address">{event.venue.address}</Dd> : null}

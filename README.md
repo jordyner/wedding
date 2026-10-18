@@ -14,7 +14,7 @@ Every event fact lives in **`content/event.ts`**. The website and the emails bot
 | `couple.first`, `couple.second` | `[Jméno]` |
 | `couple.initials` | `[A]`, `[J]` (the envelope seal) |
 | `date` | `[den a datum svatby]` |
-| `time` | `[čas obřadu]` |
+| `time` | `[čas obřadu]` (use `""` to hide the time line) |
 | `venue.name`, `venue.address` | `[místo obřadu]`, `[obec / adresa]` (use `""` to hide the address line) |
 | `nights.first`, `nights.second` | `[datum 1. noci]`, `[datum 2. noci]` |
 

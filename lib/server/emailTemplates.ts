@@ -12,7 +12,7 @@ function accommodationLine(r: Summary): string {
   return "—";
 }
 
-const colors = { page: "#f3ebe6", paper: "#fcf8f1", ink: "#3b3230", soft: "#6b5a55", accent: "#9b5550", rule: "#e6cfc8" };
+const colors = { page: "#f1eadf", paper: "#fdfaf3", ink: "#36302a", soft: "#625646", accent: "#7a5d35", rule: "#e3d5bb" };
 
 function layout(inner: string, preheader: string): string {
   return `<!doctype html>

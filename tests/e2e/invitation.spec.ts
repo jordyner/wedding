@@ -26,7 +26,6 @@ test.describe("routing", () => {
 test.describe("envelope", () => {
   test("starts closed and shows nothing of the RSVP", async ({ page }) => {
     await page.goto("/pozvanka");
-    await expect(page.getByText("Máme pro tebe pozvánku")).toBeVisible();
     await expect(page.getByText("Klepnutím otevři")).toBeVisible();
     await expect(page.getByRole("button", { name: "Otevřít obálku s pozvánkou" })).toBeVisible();
     await expect(page.getByTestId("invitation")).toHaveCount(0);

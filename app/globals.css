@@ -3,33 +3,36 @@
    WCAG AA on both paper tones.
    ------------------------------------------------------------------ */
 :root {
-  --table: #efe6e1;          /* the surface the stationery lies on */
-  --table-light: #f7f1ed;
-  --paper: #fcf8f1;          /* invitation card, warm ivory */
-  --paper-edge: #efe5d6;
-  --reply-paper: #faf0ec;    /* reply card, faint blush */
-  --envelope: #ecd8d1;
-  --envelope-side: #e6cdc5;
-  --envelope-bottom: #efdcd5;
-  --envelope-flap: #e9d2ca;
-  --liner: #d9e1d3;          /* muted sage liner */
-  --liner-stripe: #ccd6c5;
+  --table: #ede5d8;          /* the surface the stationery lies on */
+  --table-light: #f7f2e9;
+  --paper: #fdfaf3;          /* invitation card, warm ivory */
+  --paper-edge: #ede2cf;
+  --reply-paper: #f9f3e7;    /* reply card, faint champagne */
+  --envelope: #ebdfca;
+  --envelope-side: #e4d6bd;
+  --envelope-bottom: #efe5d2;
+  --envelope-flap: #e8dbc3;
+  --liner: #e6d6b8;          /* champagne-gold pinstripe liner */
+  --liner-stripe: #d9c49d;
   --seal: #c48a83;
   --seal-deep: #a96e68;
 
-  --ink: #3b3230;            /* 11.8:1 on paper */
-  --ink-soft: #66544f;       /* 6.7:1 on paper, 6.4:1 on reply paper */
-  --accent: #985550;         /* 5.3:1 on paper, 5.0:1 on reply paper — links, focus, buttons */
-  --accent-strong: #7f423e;
-  --blush-line: #dcb7ae;     /* decorative rules only */
-  --error: #a3352d;          /* 6.0:1 on reply paper */
-  --control-line: #8f7a74;   /* 3.6:1, input and radio outlines */
+  --ink: #36302a;            /* 12.5:1 on paper */
+  --ink-soft: #625646;       /* 6.9:1 on paper, 6.5:1 on reply paper */
+  --accent: #7a5d35;         /* deep champagne bronze, 5.9:1 on paper, 5.5:1 on reply paper — links, focus, buttons */
+  --accent-strong: #5f4726;
+  --blush-line: #d8c39f;     /* champagne rules, decorative only */
+  --error: #9e3a2e;          /* 6.1:1 on reply paper */
+  --control-line: #8a7c68;   /* 3.7:1, input and radio outlines */
   --success: #4f6b4a;
 
   --shadow-paper:
-    0 1px 1px rgb(80 50 44 / 0.06),
-    0 6px 14px -6px rgb(80 50 44 / 0.16),
-    0 28px 60px -24px rgb(80 50 44 / 0.28);
+    0 1px 1px rgb(74 58 38 / 0.06),
+    0 6px 14px -6px rgb(74 58 38 / 0.16),
+    0 28px 60px -24px rgb(74 58 38 / 0.28);
+
+  /* side space between the screen edge (and its green frame) and the paper */
+  --gutter: clamp(1.75rem, 6vw, 2.5rem);
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -70,7 +73,7 @@ body {
 }
 
 ::selection {
-  background: #ebc9c1;
+  background: #ead9b9;
   color: var(--ink);
 }
 
@@ -141,12 +144,16 @@ a:hover {
   position: relative;
   z-index: 1;
   min-height: 100svh;
-  padding: var(--pad-top) 1rem var(--pad-bottom);
+  padding: var(--pad-top) var(--gutter) var(--pad-bottom);
 }
 
 .sheet {
   width: min(100%, 34rem);
   margin-inline: auto;
+}
+/* the open card sits a little higher than the envelope did */
+.page:has(.sheet) {
+  --pad-top: clamp(2.75rem, 6vw, 3.5rem);
 }
 
 /* ------------------------------------------------------------------
@@ -160,15 +167,6 @@ a:hover {
   justify-items: center;
   gap: clamp(1.75rem, 5vw, 2.5rem);
   text-align: center;
-}
-
-.envelope-intro {
-  margin: 0;
-  font-style: italic;
-  font-size: clamp(1.375rem, 4.6vw, 1.75rem);
-  line-height: 1.3;
-  color: var(--ink);
-  text-wrap: balance;
 }
 
 .envelope-hint {
@@ -247,12 +245,12 @@ a:hover {
   position: absolute;
   inset: 0;
   border-radius: 3px;
-  background: linear-gradient(180deg, #f2e2dc 0%, #eadad3 55%, #e2cdc6 100%);
+  background: linear-gradient(180deg, #f1e8d8 0%, #e9dcc6 55%, #e0d1b7 100%);
   box-shadow:
-    inset 0 0 0 1px rgb(255 246 242 / 0.35),
-    0 1px 1px rgb(80 50 44 / 0.08),
-    0 10px 18px -8px rgb(80 50 44 / 0.28),
-    0 34px 60px -26px rgb(80 50 44 / 0.4);
+    inset 0 0 0 1px rgb(255 250 240 / 0.35),
+    0 1px 1px rgb(74 58 38 / 0.08),
+    0 10px 18px -8px rgb(74 58 38 / 0.28),
+    0 34px 60px -26px rgb(74 58 38 / 0.4);
 }
 
 .env-card-window {
@@ -281,7 +279,7 @@ a:hover {
   top: 0;
   left: 0;
   display: block;
-  width: min(100vw - 2rem, 34rem);
+  width: min(100vw - 2 * var(--gutter), 34rem);
   transform: scale(var(--mini-scale, 0.8));
   transform-origin: 0 0;
   box-shadow: none;
@@ -349,13 +347,13 @@ a:hover {
   inset: 0;
   pointer-events: none;
   clip-path: polygon(0 0, 100% 0, 54% 90%, 50% 100%, 46% 90%);
-  background: linear-gradient(180deg, rgb(70 36 30 / 0.55), rgb(70 36 30 / 0.2));
+  background: linear-gradient(180deg, rgb(66 50 30 / 0.55), rgb(66 50 30 / 0.2));
   opacity: 0;
 }
 .env-flap-back .env-flap-shade {
   /* the inside face is drawn upside down, so its shading is too */
   clip-path: polygon(0 100%, 100% 100%, 54% 10%, 50% 0, 46% 10%);
-  background: linear-gradient(0deg, rgb(70 36 30 / 0.55), rgb(70 36 30 / 0.2));
+  background: linear-gradient(0deg, rgb(66 50 30 / 0.55), rgb(66 50 30 / 0.2));
   opacity: 0.12;
 }
 .env-flap.is-open {
@@ -541,7 +539,7 @@ a:hover {
   position: absolute;
   inset: clamp(0.625rem, 2.4vw, 0.875rem);
   border: 1px solid var(--blush-line);
-  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px rgb(220 183 174 / 0.55);
+  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px rgb(214 194 158 / 0.55);
   pointer-events: none;
 }
 .invitation:focus {
@@ -696,9 +694,25 @@ a:hover {
 }
 
 .respond {
+  /* stays in view at the bottom of the screen until the guest scrolls to its place */
+  position: sticky;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(1rem, 3vw, 1.5rem));
+  z-index: 2;
   display: grid;
   justify-items: center;
-  margin-top: clamp(2rem, 6vw, 2.75rem);
+  margin-top: clamp(1.5rem, 5vw, 2.25rem);
+}
+/* frosted and translucent: readable when it floats over the card, but quieter than it */
+.respond .btn {
+  border-color: rgb(122 93 53 / 0.55);
+  background: rgb(253 250 243 / 0.55);
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  backdrop-filter: blur(8px) saturate(1.1);
+  box-shadow: 0 6px 18px -10px rgb(74 58 38 / 0.3);
+}
+.respond .btn:hover {
+  border-color: var(--accent);
+  background: rgb(253 250 243 / 0.8);
 }
 .respond.is-entering {
   animation: rise-in 500ms var(--ease-out) 300ms both;
@@ -735,7 +749,7 @@ a:hover {
   touch-action: manipulation;
 }
 .btn:hover {
-  background: rgb(152 85 80 / 0.07);
+  background: rgb(122 93 53 / 0.07);
   color: var(--accent-strong);
 }
 .btn:active {
@@ -743,12 +757,12 @@ a:hover {
 }
 .btn-primary {
   background: var(--accent);
-  color: #fffaf6;
-  box-shadow: 0 1px 1px rgb(80 50 44 / 0.12), 0 8px 18px -10px rgb(127 66 62 / 0.6);
+  color: #fffbf3;
+  box-shadow: 0 1px 1px rgb(74 58 38 / 0.12), 0 8px 18px -10px rgb(95 71 38 / 0.6);
 }
 .btn-primary:hover {
   background: var(--accent-strong);
-  color: #fffaf6;
+  color: #fffbf3;
 }
 .btn[disabled],
 .btn[aria-disabled="true"] {
@@ -947,7 +961,7 @@ a:hover {
   transition: background-color 160ms ease;
 }
 .choice:hover {
-  background: rgb(152 85 80 / 0.05);
+  background: rgb(122 93 53 / 0.05);
 }
 .choice input {
   appearance: none;
@@ -1152,6 +1166,100 @@ a:hover {
   to {
     transform: rotate(2.5deg) translate(-1.5%, 1%);
   }
+}
+
+/* ------------------------------------------------------------------
+   Screen frame: a double hairline with eucalyptus sprigs in the corners.
+   ------------------------------------------------------------------ */
+.screen-frame {
+  --frame-inset: clamp(8px, 1.6vw, 18px);
+  /* garland: soft eucalyptus greens, ivory-blush roses */
+  --leaf-light: rgb(160 188 146 / 0.5);
+  --leaf-dark: rgb(118 154 110 / 0.5);
+  --petal: #fbf4ee;
+  --petal-mid: #f4e2d8;
+  --petal-deep: #ecd0c4;
+  --petal-line: rgb(176 136 118 / 0.55);
+  --pollen: #d7b77a;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  color: rgb(82 122 80 / 0.68);
+}
+.screen-frame::before,
+.screen-frame::after {
+  content: "";
+  position: absolute;
+  inset: var(--frame-inset);
+  border: 1px solid rgb(184 156 110 / 0.38);
+}
+.screen-frame::after {
+  inset: calc(var(--frame-inset) + 4px);
+  border-color: rgb(184 156 110 / 0.2);
+}
+.frame-corner {
+  position: absolute;
+  width: clamp(190px, 34vw, 420px);
+  aspect-ratio: 1;
+}
+/* the corners on the other diagonal are a little shorter, so the frame isn't rigid */
+.frame-tr,
+.frame-bl {
+  width: clamp(150px, 26vw, 330px);
+}
+/* the sprigs grow straight out of the screen's edges */
+.frame-tl {
+  top: 0;
+  left: 0;
+}
+.frame-tr {
+  top: 0;
+  right: 0;
+  transform: scaleX(-1);
+}
+.frame-bl {
+  bottom: 0;
+  left: 0;
+  transform: scaleY(-1);
+}
+.frame-br {
+  right: 0;
+  bottom: 0;
+  transform: rotate(180deg);
+}
+.frame-sprig {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+/* Full length around the closed envelope; once it starts opening (or on any page
+   without it) the stems draw back to their corners and the outer leaves fold away. */
+.frame-stem {
+  stroke-dasharray: 1;
+  stroke-dashoffset: var(--short);
+  transition: stroke-dashoffset 1100ms var(--ease-in-out) 120ms;
+}
+.frame-leaf {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+.frame-leaf.is-tail {
+  opacity: 0;
+  transform: scale(0.2);
+  transition:
+    transform 520ms var(--ease-in-out) var(--d),
+    opacity 420ms ease var(--d);
+}
+body:has(.envelope-stage.is-closed) .frame-stem {
+  stroke-dashoffset: 0;
+}
+body:has(.envelope-stage.is-closed) .frame-leaf.is-tail {
+  opacity: 1;
+  transform: none;
 }
 
 /* ------------------------------------------------------------------

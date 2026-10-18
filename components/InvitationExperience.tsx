@@ -171,7 +171,6 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
 
       {phase !== "open" ? (
         <div className={`envelope-stage is-${phase}`} data-phase={phase}>
-          <p className="envelope-intro">{event.copy.envelopeIntro}</p>
           <Envelope disabled={phase !== "closed"} onOpen={open} envelopeRef={envelopeRef} miniRef={miniRef} />
           <p className="envelope-hint" aria-hidden="true">
             {event.copy.envelopeHint}

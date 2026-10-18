@@ -15,8 +15,8 @@ export const event = {
 
   /** Shown on the card in small caps, e.g. "sobota 12. června 2027". */
   date: "sobota 22. května 2027",
-  /** e.g. "ve 14 hodin" */
-  time: "13:00",
+  /** Optional, e.g. "ve 14 hodin". Use "" to hide it. */
+  time: "",
   venue: {
     /** e.g. "Zámek Loučeň" */
     name: "Pernek",
@@ -31,7 +31,6 @@ export const event = {
   },
 
   copy: {
-    envelopeIntro: "Máme pro tebe pozvánku",
     envelopeHint: "Klepnutím otevři",
     cardOpening: "Budeme se brát!",
     cardInvitation: "A budeme rádi, když u toho budeš s námi.",

@@ -33,33 +33,33 @@ export function EnvelopeDefs() {
     <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="env-side-l" x1="0" y1="0.2" x2="1" y2="0.55">
-          <stop offset="0" stopColor="#e7d1ca" />
-          <stop offset="0.7" stopColor="#f0e0da" />
-          <stop offset="1" stopColor="#f3e4de" />
+          <stop offset="0" stopColor="#e5d6bd" />
+          <stop offset="0.7" stopColor="#eee3d0" />
+          <stop offset="1" stopColor="#f2e8d6" />
         </linearGradient>
         <linearGradient id="env-side-r" x1="1" y1="0.2" x2="0" y2="0.55">
-          <stop offset="0" stopColor="#e2cac2" />
-          <stop offset="0.7" stopColor="#ecdbd4" />
-          <stop offset="1" stopColor="#f0e0da" />
+          <stop offset="0" stopColor="#dfcfb3" />
+          <stop offset="0.7" stopColor="#eadfca" />
+          <stop offset="1" stopColor="#eee3d0" />
         </linearGradient>
         <radialGradient id="env-light" cx="0.22" cy="0.12" r="1.1">
-          <stop offset="0" stopColor="rgb(255 250 247 / 0.28)" />
-          <stop offset="0.55" stopColor="rgb(255 250 247 / 0)" />
-          <stop offset="1" stopColor="rgb(70 36 30 / 0.07)" />
+          <stop offset="0" stopColor="rgb(255 252 244 / 0.28)" />
+          <stop offset="0.55" stopColor="rgb(255 252 244 / 0)" />
+          <stop offset="1" stopColor="rgb(66 50 30 / 0.07)" />
         </radialGradient>
         <linearGradient id="env-fold-shadow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="rgb(80 46 40 / 0.16)" />
-          <stop offset="1" stopColor="rgb(80 46 40 / 0)" />
+          <stop offset="0" stopColor="rgb(76 58 36 / 0.16)" />
+          <stop offset="1" stopColor="rgb(76 58 36 / 0)" />
         </linearGradient>
         <linearGradient id="env-bottom" x1="0.3" y1="0" x2="0.6" y2="1">
-          <stop offset="0" stopColor="#f9f0ec" />
-          <stop offset="0.6" stopColor="#f5e9e4" />
-          <stop offset="1" stopColor="#eee0da" />
+          <stop offset="0" stopColor="#f8f2e6" />
+          <stop offset="0.6" stopColor="#f4ecdd" />
+          <stop offset="1" stopColor="#ede2cf" />
         </linearGradient>
         <linearGradient id="env-flap" x1="0.35" y1="0" x2="0.55" y2="1">
-          <stop offset="0" stopColor="#f7ede9" />
-          <stop offset="0.65" stopColor="#f1e3dd" />
-          <stop offset="1" stopColor="#e9d7d0" />
+          <stop offset="0" stopColor="#f6efe2" />
+          <stop offset="0.65" stopColor="#f0e6d4" />
+          <stop offset="1" stopColor="#e7dac3" />
         </linearGradient>
         <pattern id="env-liner" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
           <rect width="4" height="4" fill="var(--liner)" />
@@ -87,7 +87,7 @@ export function EnvelopePocket() {
         <path d={SIDE_L} fill="url(#env-side-l)" />
         <path d={SIDE_R} fill="url(#env-side-r)" />
         {/* the bottom flap is glued over the side flaps and casts a soft shadow on them */}
-        <path d={BOTTOM} transform="translate(0 -1.1)" fill="rgb(80 46 40 / 0.22)" filter="url(#env-soft)" />
+        <path d={BOTTOM} transform="translate(0 -1.1)" fill="rgb(76 58 36 / 0.22)" filter="url(#env-soft)" />
         <path d={BOTTOM} fill="url(#env-bottom)" />
         {[SIDE_L, SIDE_R, BOTTOM].map((d) => (
           <g key={d}>
@@ -95,9 +95,9 @@ export function EnvelopePocket() {
             <path d={d} fill="url(#env-light)" />
           </g>
         ))}
-        <path d={BOTTOM_EDGE} fill="none" stroke="rgb(255 248 244 / 0.85)" strokeWidth="0.35" />
+        <path d={BOTTOM_EDGE} fill="none" stroke="rgb(255 251 242 / 0.85)" strokeWidth="0.35" />
         {/* paper edge along the envelope's bottom */}
-        <path d="M0 69.7 H100" stroke="rgb(255 248 244 / 0.55)" strokeWidth="0.4" />
+        <path d="M0 69.7 H100" stroke="rgb(255 251 242 / 0.55)" strokeWidth="0.4" />
       </svg>
     </span>
   );
@@ -109,13 +109,13 @@ export function EnvelopeFlap({ open = false, seal }: { open?: boolean; seal?: Re
       <span className="env-flap-face env-flap-front">
         <svg viewBox="0 0 100 42">
           {/* shadow the closed flap casts on the envelope below it */}
-          <path d={FLAP} transform="translate(0 1.2)" fill="rgb(80 46 40 / 0.2)" filter="url(#env-soft)" />
+          <path d={FLAP} transform="translate(0 1.2)" fill="rgb(76 58 36 / 0.2)" filter="url(#env-soft)" />
           <path d={FLAP} fill="url(#env-flap)" />
           <path d={FLAP} fill="url(#env-grain)" opacity="0.5" />
           <path d={FLAP} fill="url(#env-light)" />
           {/* the fold along the hinge catches a little shadow */}
           <rect x="0" y="0" width="100" height="3" fill="url(#env-fold-shadow)" />
-          <path d={FLAP_EDGE} fill="none" stroke="rgb(255 248 244 / 0.7)" strokeWidth="0.3" />
+          <path d={FLAP_EDGE} fill="none" stroke="rgb(255 251 242 / 0.7)" strokeWidth="0.3" />
         </svg>
         <span className="env-flap-shade" />
         {seal}
@@ -153,7 +153,10 @@ export function Envelope({ disabled, onOpen, envelopeRef, miniRef }: Props) {
     if (!button || !mini) return;
     const measure = () => {
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      const cardWidth = Math.min(document.documentElement.clientWidth - 2 * rem, 34 * rem);
+      // Same width the open card gets: the page minus its side gutters, at most 34rem.
+      const page = button.closest(".page");
+      const gutter = page ? parseFloat(getComputedStyle(page).paddingLeft) : rem;
+      const cardWidth = Math.min(document.documentElement.clientWidth - 2 * gutter, 34 * rem);
       mini.style.width = `${cardWidth}px`;
       mini.style.setProperty("--mini-scale", String((button.offsetWidth * 0.86) / cardWidth));
     };
