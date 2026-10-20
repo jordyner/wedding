@@ -33,6 +33,8 @@
 
   /* side space between the screen edge and the paper */
   --gutter: 1rem;
+  /* space above the open card */
+  --sheet-top: clamp(1rem, 3.5vw, 2.25rem);
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -147,13 +149,19 @@ a:hover {
   padding: var(--pad-top) var(--gutter) var(--pad-bottom);
 }
 
+/* short standalone notes (private, not found): centred, a touch above the middle */
+.page-center {
+  display: grid;
+  align-content: center;
+  padding-bottom: calc(var(--pad-bottom) + 8svh);
+}
 .sheet {
   width: min(100%, 34rem);
   margin-inline: auto;
 }
 /* the open card sits a little higher than the envelope did */
 .page:has(.sheet) {
-  --pad-top: clamp(1rem, 3.5vw, 2.25rem);
+  --pad-top: var(--sheet-top);
 }
 
 /* ------------------------------------------------------------------
@@ -541,6 +549,24 @@ a:hover {
   border: 1px solid var(--blush-line);
   box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px rgb(214 194 158 / 0.55);
   pointer-events: none;
+}
+/* On a phone held upright the card and the reply button fill exactly one screen:
+   the card stretches to the bottom, its lines spread evenly, the button sits
+   at the bottom edge. Applies to the miniature in the envelope too, so the
+   hand-off between them stays seamless. */
+@media (max-width: 40rem) and (orientation: portrait) {
+  .invitation {
+    min-height: calc(
+      100svh - var(--sheet-top) - 1.5rem - 2.75rem - 1.25rem - env(safe-area-inset-bottom, 0px)
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+  }
+  .respond {
+    margin-top: 1.5rem;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 1.25rem);
+  }
 }
 .invitation:focus {
   outline: none;

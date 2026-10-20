@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 /** Shown by proxy.ts to anyone without the invitation key. Says nothing about the wedding. */
 export default function LockedPage() {
   return (
-    <main className="page">
+    <main className="page page-center">
       <div className="sheet">
         <section className="paper reply reply-standalone done" aria-labelledby="locked-title">
           <h1 className="reply-title" id="locked-title">

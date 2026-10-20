@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <main className="page">
+    <main className="page page-center">
       <div className="sheet">
         <section className="paper reply reply-standalone done" aria-labelledby="nf-title">
           <h1 className="reply-title" id="nf-title">
