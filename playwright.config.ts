@@ -1,10 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
+import { INVITE_COOKIE, inviteToken } from "./lib/invite";
 
 const DB_PORT = 54340;
 const MAIL_PORT = 4020;
 const APP_PORT = 3300;
 
 export const MAIL_URL = `http://127.0.0.1:${MAIL_PORT}`;
+export const INVITE_CODE = "test-klic";
 
 /**
  * End-to-end tests run a production build against a throwaway in-memory Postgres
@@ -17,7 +19,26 @@ export default defineConfig({
   fullyParallel: false,
   retries: 0,
   reporter: [["list"]],
-  use: { baseURL: `http://localhost:${APP_PORT}`, trace: "retain-on-failure" },
+  use: {
+    baseURL: `http://localhost:${APP_PORT}`,
+    trace: "retain-on-failure",
+    // Every test is an invited guest unless it clears this (see gate.spec.ts).
+    storageState: {
+      cookies: [
+        {
+          name: INVITE_COOKIE,
+          value: inviteToken(INVITE_CODE),
+          domain: "localhost",
+          path: "/",
+          expires: -1,
+          httpOnly: true,
+          secure: false,
+          sameSite: "Lax",
+        },
+      ],
+      origins: [],
+    },
+  },
   projects: [
     { name: "mobile", use: { ...devices["Pixel 7"], viewport: { width: 390, height: 844 } } },
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
@@ -46,6 +67,7 @@ export default defineConfig({
         RESEND_API_URL: MAIL_URL,
         EMAIL_FROM: "Svatba Jordánovi <test@example.com>",
         PUBLIC_SITE_URL: `http://localhost:${APP_PORT}`,
+        INVITE_CODE,
       },
       url: `http://localhost:${APP_PORT}/pozvanka`,
       timeout: 240_000,

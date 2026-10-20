@@ -62,6 +62,7 @@ The e2e suite starts a throwaway in-memory Postgres and `scripts/mock-resend.mts
    | `EMAIL_FROM` | `Svatba Jordánovi <pozvanka@svatbajordanovi.cz>` |
    | `EMAIL_REPLY_TO` | your personal inbox (guests' replies go there, so this is also how they ask for an email change) |
    | `PUBLIC_SITE_URL` | `https://svatbajordanovi.cz` |
+   | `INVITE_CODE` | the invitation key, e.g. `jaro27`: guests open `https://svatbajordanovi.cz/pozvanka?k=jaro27`. Without it the live site stays locked. Changing it signs every browser out. |
 
    Do not set `RESEND_API_URL` in production. Functions run in `fra1` (`vercel.json`), next to the Neon database.
 6. **Domain:** in Vercel, add `svatbajordanovi.cz` (and optionally `www`, redirecting to the apex), then follow the DNS instructions.
