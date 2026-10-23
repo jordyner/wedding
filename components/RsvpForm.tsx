@@ -40,7 +40,7 @@ const MESSAGES = {
   updated: "Hotovo, změny jsme uložili.",
 } as const;
 
-const SAVED_NOTE_MS = 3500;
+const SAVED_NOTE_MS = 4000;
 
 function newSubmissionId() {
   return crypto.randomUUID();
@@ -379,14 +379,13 @@ export function RsvpForm({
         {/* on <body>: the reply card's animation would otherwise pin a fixed element to the card */}
         {savedNote
           ? createPortal(
-              <p className="saved-toast" aria-hidden="true" data-testid="rsvp-saved">
-                <span key={savedNote}>
-                  <svg viewBox="0 0 16 16" aria-hidden="true">
-                    <path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  Díky! Odpověď jsme uložili.
-                </span>
-              </p>,
+              // A little card of the same stationery: it settles, the postmark is pressed
+              // onto it, and after a moment it lifts away.
+              <div className="saved-card" key={savedNote} aria-hidden="true" data-testid="rsvp-saved">
+                <Postmark />
+                <p className="saved-card-script">Díky!</p>
+                <p className="saved-card-line">Odpověď jsme uložili</p>
+              </div>,
               document.body,
             )
           : null}

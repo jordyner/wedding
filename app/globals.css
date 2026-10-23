@@ -1319,50 +1319,76 @@ a:hover {
   text-wrap: pretty;
 }
 
-/* "Saved" (no email): a short note in the middle of the screen that fades away */
-.saved-toast {
+/* "Saved" (no email): a small card of the invitation's stationery in the middle of the
+   screen. It settles, the postmark is pressed onto it, then it lifts away. */
+.saved-card {
   position: fixed;
   top: 50%;
   left: 50%;
   z-index: 20;
-  margin: 0;
-  translate: -50% -50%;
+  width: min(16rem, 100vw - 3rem);
+  /* centred by margins: transform belongs to the animation */
+  margin: -7.5rem 0 0 calc(min(16rem, 100vw - 3rem) / -2);
+  padding: 1.6rem 1.25rem 1.5rem;
+  display: grid;
+  justify-items: center;
+  background: var(--paper);
+  border-radius: 2px;
+  box-shadow: var(--shadow-paper);
+  text-align: center;
+  pointer-events: none;
+  animation: saved-card 4000ms var(--ease-out) both;
+}
+/* fine gold frame, like the invitation's */
+.saved-card::before {
+  content: "";
+  position: absolute;
+  inset: 0.45rem;
+  border: 1px solid;
+  border-image: linear-gradient(120deg, #b38f57, #e8d2a0 45%, #b8955c 70%, #dcc28c) 1;
   pointer-events: none;
 }
-.saved-toast span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-  padding: 0.8rem 1.4rem;
-  border: 1px solid var(--blush-line);
-  border-radius: 999px;
-  background: var(--paper);
-  color: var(--accent);
+.saved-card .postmark {
+  width: 5.25rem;
+  height: 5.25rem;
+  margin: 0 0 0.35rem;
+  animation-delay: 380ms;
+}
+.saved-card-script {
+  margin: 0;
+  font-family: var(--font-script), cursive;
+  font-size: 2.25rem;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.saved-card-line {
+  margin: 0.35rem 0 0;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.14em;
   font-size: 1.0625rem;
-  box-shadow: 0 14px 34px -14px rgb(74 58 38 / 0.45);
-  animation: saved-toast 3500ms var(--ease-out) both;
+  color: var(--ink-soft);
 }
-.saved-toast svg {
-  width: 1rem;
-  height: 1rem;
-}
-@keyframes saved-toast {
+@keyframes saved-card {
   0% {
     opacity: 0;
-    transform: translateY(8px) scale(0.97);
+    transform: translateY(18px) rotate(-4deg) scale(0.96);
   }
-  10%,
-  80% {
+  12% {
     opacity: 1;
-    transform: none;
+    transform: rotate(-1.5deg);
+  }
+  82% {
+    opacity: 1;
+    transform: rotate(-1.5deg);
   }
   100% {
     opacity: 0;
+    transform: translateY(-14px) rotate(-1deg);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .saved-toast span {
+  .saved-card,
+  .saved-card .postmark {
     animation: none;
   }
 }
