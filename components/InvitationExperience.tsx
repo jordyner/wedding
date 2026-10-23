@@ -15,7 +15,7 @@ import {
   EnvelopeFlap,
   EnvelopePocket,
 } from "./Envelope";
-import { GoldFlakes } from "./GoldFlakes";
+import { GoldBurst, GoldFlakes } from "./GoldFlakes";
 import { RsvpForm } from "./RsvpForm";
 import { WaxSealDefs } from "./WaxSeal";
 
@@ -50,6 +50,16 @@ export function InvitationExperience({
   const [animate, setAnimate] = useState(true);
   const [handoff, setHandoff] = useState<Handoff | null>(null);
   const [replyOpen, setReplyOpen] = useState(false);
+  const [bursts, setBursts] = useState<{ id: number; x: number; y: number }[]>([]);
+  const burstId = useRef(0);
+
+  // A small hidden delight: tapping the card scatters a pinch of gold leaf.
+  function sprinkleGold(e: React.MouseEvent<HTMLElement>) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.getSelection()?.toString()) return;
+    const id = ++burstId.current;
+    setBursts((all) => [...all.slice(-3), { id, x: e.clientX, y: e.clientY }]);
+  }
 
   const envelopeRef = useRef<HTMLButtonElement>(null);
   const miniRef = useRef<HTMLSpanElement>(null);
@@ -261,6 +271,9 @@ export function InvitationExperience({
       ) : (
         <div className="sheet" data-phase="open">
           {animate ? <GoldFlakes /> : null}
+          {bursts.map((b) => (
+            <GoldBurst key={b.id} x={b.x} y={b.y} onDone={() => setBursts((all) => all.filter((o) => o.id !== b.id))} />
+          ))}
           {handoff ? (
             <div
               className="envelope-ghost is-back"
@@ -282,6 +295,7 @@ export function InvitationExperience({
                 aria-labelledby="invitation-title"
                 tabIndex={-1}
                 data-testid="invitation"
+                onClick={sprinkleGold}
               >
                 {card}
               </article>

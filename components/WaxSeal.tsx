@@ -27,15 +27,15 @@ export function WaxSealDefs() {
     <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
       <defs>
         <radialGradient id="wax-body" cx="34%" cy="28%" r="78%">
-          <stop offset="0" stopColor="#d48c86" />
-          <stop offset="0.38" stopColor="#b2564f" />
-          <stop offset="0.78" stopColor="#913f3b" />
-          <stop offset="1" stopColor="#6c2b29" />
+          <stop offset="0" stopColor="#b8615b" />
+          <stop offset="0.38" stopColor="#8f3433" />
+          <stop offset="0.78" stopColor="#702427" />
+          <stop offset="1" stopColor="#4f171a" />
         </radialGradient>
         <radialGradient id="wax-well" cx="64%" cy="70%" r="72%">
-          <stop offset="0" stopColor="#b9615a" />
-          <stop offset="0.6" stopColor="#a04b46" />
-          <stop offset="1" stopColor="#853a37" />
+          <stop offset="0" stopColor="#8e3936" />
+          <stop offset="0.6" stopColor="#7a2a2b" />
+          <stop offset="1" stopColor="#611f22" />
         </radialGradient>
         <linearGradient id="wax-rim" x1="0.15" y1="0.1" x2="0.85" y2="0.9">
           <stop offset="0" stopColor="rgb(255 214 206 / 0.8)" />
@@ -71,7 +71,7 @@ export function WaxSeal({ monogram }: { monogram: string }) {
     <svg className="wax-seal" viewBox="-8 -8 116 120" aria-hidden="true" focusable="false">
       {/* cast shadow and the wax's thickness */}
       <path d={blob} transform="translate(1.5 4.2)" fill="rgb(60 16 18 / 0.42)" filter="url(#wax-soft)" />
-      <path d={blob} transform="translate(0 2)" fill="#5a2524" />
+      <path d={blob} transform="translate(0 2)" fill="#3f1214" />
       <path d={blob} fill="url(#wax-body)" />
       {/* uneven poured surface */}
       <path d={blob} fill="url(#env-grain)" opacity="0.35" />
@@ -91,7 +91,7 @@ export function WaxSeal({ monogram }: { monogram: string }) {
         <text x="50.8" y="52.4" fill="rgb(56 6 10 / 0.6)">
           {monogram}
         </text>
-        <text x="50" y="51.6" fill="#a8534d">
+        <text x="50" y="51.6" fill="#86322f">
           {monogram}
         </text>
       </g>
