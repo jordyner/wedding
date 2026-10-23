@@ -54,8 +54,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  /* matches the top of the page, so the phone's status bar shows no band */
-  background: var(--table-light);
+  background: var(--table);
   /* no rubber-band bounce revealing the in-app browser's white backdrop */
   overscroll-behavior: none;
 }
@@ -65,9 +64,9 @@ body {
   overscroll-behavior: none;
   min-height: 100svh;
   color: var(--ink);
-  /* the top colour is also the body's background-color, which Safari uses for
-     the status bar, so there's no band above the page */
-  background: linear-gradient(180deg, var(--table-light) 0, var(--table) 70svh) var(--table-light);
+  /* one flat colour everywhere, so the status bar, the page and the area under
+     Safari's toolbar all match */
+  background: var(--table);
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
   font-size: 1.125rem;
   line-height: 1.6;
@@ -217,7 +216,7 @@ a:hover {
 
 .envelope,
 .envelope-ghost {
-  --w: min(64vw, 420px);
+  --w: min(72vw, 420px);
   /* depth for the flap: a short perspective makes the hinge read as 3D */
   perspective: 720px;
   perspective-origin: 50% 10%;
@@ -388,7 +387,8 @@ a:hover {
   position: absolute;
   left: 50%;
   top: 100%;
-  width: clamp(4.5rem, 21vw, 5.5rem);
+  /* in proportion to the envelope, like a real seal */
+  width: calc(var(--w) * 0.23);
   aspect-ratio: 116 / 120;
   translate: -50% -64%;
 }
@@ -831,6 +831,20 @@ a:hover {
 /* room below the card so the floating button never covers its last line */
 .page:has(.sheet) {
   --pad-bottom: 5.5rem;
+}
+/* phones: card and button are centred together as one group; the space for the
+   button is reserved under the card and the button is placed into it (see
+   InvitationExperience) */
+@media (max-width: 40rem) {
+  .page:has(.sheet) {
+    --pad-bottom: var(--pad-top);
+  }
+  .first-screen {
+    padding-bottom: 4rem;
+  }
+  .respond {
+    bottom: var(--respond-bottom, calc(env(safe-area-inset-bottom, 0px) + 1rem));
+  }
 }
 /* Minimal: a small frosted pill with a hairline, readable over the card but never
    louder than it. Still a 44px tap target. */

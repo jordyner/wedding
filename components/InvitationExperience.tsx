@@ -197,6 +197,31 @@ export function InvitationExperience({
     if (replyOpen) goToReply();
   }, [replyOpen]);
 
+  // Phones: place the floating button just under the card, so the two read as one
+  // centred group (it still floats, and never sits lower than the screen edge).
+  const respondRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (phase !== "open") return;
+    const place = () => {
+      const card = cardRef.current;
+      const respond = respondRef.current;
+      if (!card || !respond) return;
+      if (!window.matchMedia("(max-width: 40rem)").matches) {
+        respond.style.removeProperty("--respond-bottom");
+        return;
+      }
+      let top = 0;
+      for (let el: HTMLElement | null = card; el; el = el.offsetParent as HTMLElement | null) top += el.offsetTop;
+      const button = respond.querySelector("button");
+      const gap = 18;
+      const bottom = window.innerHeight - (top + card.offsetHeight) - gap - (button?.offsetHeight ?? 44);
+      respond.style.setProperty("--respond-bottom", `${Math.max(16, Math.round(bottom))}px`);
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [phase]);
+
   // The floating button steps aside while the reply card is on screen.
   const [replyInView, setReplyInView] = useState(false);
   useEffect(() => {
@@ -274,7 +299,10 @@ export function InvitationExperience({
             ) : null}
 
             {/* Always visible; once the reply card is open it takes the guest back to it. */}
-            <div className={`respond${animate ? " is-entering" : ""}${replyInView ? " is-away" : ""}`}>
+            <div
+              ref={respondRef}
+              className={`respond${animate ? " is-entering" : ""}${replyInView ? " is-away" : ""}`}
+            >
               <button
                 type="button"
                 className="btn"

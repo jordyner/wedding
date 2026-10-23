@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f2e9",
+  themeColor: "#ede5d8",
   colorScheme: "light",
   // draw under the iPhone status bar so it shows the page itself, not a band
   viewportFit: "cover",
