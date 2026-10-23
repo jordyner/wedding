@@ -54,7 +54,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  background: var(--table);
+  /* matches the top of the page, so the phone's status bar shows no band */
+  background: var(--table-light);
   /* no rubber-band bounce revealing the in-app browser's white backdrop */
   overscroll-behavior: none;
 }
@@ -212,7 +213,7 @@ a:hover {
 
 .envelope,
 .envelope-ghost {
-  --w: min(86vw, 440px);
+  --w: min(74vw, 420px);
   /* depth for the flap: a short perspective makes the hinge read as 3D */
   perspective: 720px;
   perspective-origin: 50% 10%;
@@ -558,34 +559,6 @@ a:hover {
   --glint: linear-gradient(120deg, transparent 44%, rgb(255 249 232 / 0.95) 50%, transparent 56%);
   --frame-inset: clamp(0.625rem, 2.4vw, 0.875rem);
 }
-/* Paper feel on the light ivory card: a fine cotton grain, light falling softly
-   from the top left, a faint warm falloff to the far corner and a bright cut edge. */
-.paper-sheet {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(130% 80% at 15% 0%, rgb(255 255 255 / 0.6), transparent 60%),
-    radial-gradient(90% 70% at 100% 100%, rgb(170 140 100 / 0.06), transparent 70%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .3 0 0 0 .5 -.15'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E") 0 0 / 200px 200px;
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.7),
-    inset 0 -1px 0 1px rgb(190 165 125 / 0.12);
-  border-radius: inherit;
-  pointer-events: none;
-}
-.invitation::before {
-  display: none;
-}
-
-/* Ink on paper */
-.invitation .name {
-  filter: url(#ink);
-}
-.invitation :is(.inv-opening, .inv-invite, .inv-detail) {
-  filter: url(#ink-fine);
-}
-
 .inv-foil {
   position: absolute;
   inset: var(--frame-inset);
@@ -616,17 +589,24 @@ a:hover {
    at the bottom edge. Applies to the miniature in the envelope too, so the
    hand-off between them stays seamless. */
 @media (max-width: 40rem) and (orientation: portrait) {
+  /* the card fills the screen; the reply button floats over its lower edge */
   .invitation {
-    min-height: calc(
-      100svh - var(--sheet-top) - 1.5rem - 2.75rem - 1.25rem - env(safe-area-inset-bottom, 0px)
-    );
+    min-height: calc(100svh - var(--sheet-top) - 1rem - env(safe-area-inset-bottom, 0px));
+    padding-bottom: 5.5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
   }
-  .respond {
-    margin-top: 1.5rem;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 1.25rem);
+  .sheet .respond {
+    margin-top: calc(-2.5rem - 2.75rem);
+    margin-bottom: 2.75rem;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 2.75rem);
+  }
+  .sheet .respond .btn {
+    min-height: 2.5rem;
+    padding: 0.25rem 1.15rem;
+    font-size: 0.875rem;
+    background: rgb(253 250 243 / 0.7);
   }
 }
 .invitation:focus {
@@ -694,6 +674,13 @@ a:hover {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: amp-glint 7s ease-in-out 1.9s infinite;
+}
+/* Phones: keep the gold but not the moving glint, which repaints the whole card. */
+@media (hover: none) {
+  .inv-foil,
+  .inv-names .amp {
+    animation: none;
+  }
 }
 @keyframes amp-glint {
   0% {
@@ -798,9 +785,7 @@ a:hover {
   min-height: 2.75rem;
   padding: 0.35rem 1.35rem;
   border-color: rgb(122 93 53 / 0.32);
-  background: rgb(253 250 243 / 0.4);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  background: rgb(253 250 243 / 0.7);
   font-size: 0.95rem;
   font-variant-caps: all-small-caps;
   letter-spacing: 0.12em;

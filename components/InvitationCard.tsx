@@ -9,7 +9,6 @@ export function InvitationCard({ decorative = false }: { decorative?: boolean })
 
   return (
     <>
-      <span className="paper-sheet" aria-hidden="true" />
       <span className="inv-foil" aria-hidden="true" />
       <span className="inv-foil inv-foil-inner" aria-hidden="true" />
       <P className="inv-opening">{event.copy.cardOpening}</P>

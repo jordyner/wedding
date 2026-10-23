@@ -74,19 +74,6 @@ export function EnvelopeDefs() {
           <stop offset="0.5" stopColor="#e0c690" />
           <stop offset="1" stopColor="#b38f57" />
         </linearGradient>
-        {/* Ink on paper for the card's text: edges roughened by the paper fibres,
-            density varying like ink soaking in. "ink" for the names, "ink-fine" for body text. */}
-        <filter id="ink" x="-10%" y="-20%" width="120%" height="140%">
-          <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="3" result="fibres" />
-          <feDisplacementMap in="SourceGraphic" in2="fibres" scale="1.2" xChannelSelector="R" yChannelSelector="G" result="rough" />
-          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="8" result="blot" />
-          <feColorMatrix in="blot" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.35 0 0 0 1.12" result="density" />
-          <feComposite in="rough" in2="density" operator="in" />
-        </filter>
-        <filter id="ink-fine" x="-2%" y="-10%" width="104%" height="120%">
-          <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" seed="5" result="fibres" />
-          <feDisplacementMap in="SourceGraphic" in2="fibres" scale="0.6" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
         <filter id="env-soft" x="-10%" y="-20%" width="120%" height="140%">
           <feGaussianBlur stdDeviation="0.9" />
         </filter>
