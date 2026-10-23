@@ -149,13 +149,13 @@ a:hover {
   position: relative;
   z-index: 1;
   min-height: 100svh;
-  padding: var(--pad-top) var(--gutter) var(--pad-bottom);
+  padding: calc(var(--pad-top) + env(safe-area-inset-top, 0px)) var(--gutter) var(--pad-bottom);
 }
 
 /* The open card and its reply button take one screen; in a taller window they sit
    centred instead of hugging the top. */
 .first-screen {
-  min-height: calc(100svh - var(--pad-top) - var(--pad-bottom));
+  min-height: calc(100svh - var(--pad-top) - var(--pad-bottom) - env(safe-area-inset-top, 0px));
   display: grid;
   align-content: center;
 }
@@ -177,9 +177,13 @@ a:hover {
 /* ------------------------------------------------------------------
    Envelope
    ------------------------------------------------------------------ */
+/* the envelope sits in the middle of the screen: equal space above and below */
+.page:has(.envelope-stage) {
+  --pad-bottom: var(--pad-top);
+}
 .envelope-stage {
   /* exactly one screen tall: nothing to drag around before opening */
-  min-height: calc(100svh - var(--pad-top) - var(--pad-bottom));
+  min-height: calc(100svh - var(--pad-top) - var(--pad-bottom) - env(safe-area-inset-top, 0px));
   display: grid;
   place-content: center;
   justify-items: center;
@@ -213,7 +217,7 @@ a:hover {
 
 .envelope,
 .envelope-ghost {
-  --w: min(74vw, 420px);
+  --w: min(64vw, 420px);
   /* depth for the flap: a short perspective makes the hinge read as 3D */
   perspective: 720px;
   perspective-origin: 50% 10%;
