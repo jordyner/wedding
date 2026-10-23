@@ -58,6 +58,7 @@ export function RsvpForm({
   const formId = useId();
   const ids = {
     name: `${formId}-name`,
+    nameHelp: `${formId}-name-help`,
     email: `${formId}-email`,
     emailHelp: `${formId}-email-help`,
     attendance: `${formId}-attendance`,
@@ -100,7 +101,8 @@ export function RsvpForm({
   }
 
   function clientErrors(v: Values): FieldErrors {
-    const r = validateRsvp(v as unknown as Record<string, unknown>, { requireEmail: !isEdit });
+    // The form asks only for a name; answers are told apart by it.
+    const r = validateRsvp(v as unknown as Record<string, unknown>, { requireEmail: false });
     return r.ok ? {} : r.errors;
   }
 
@@ -276,6 +278,11 @@ export function RsvpForm({
         <label className="field-label" htmlFor={ids.name}>
           Jméno a příjmení
         </label>
+        {!isEdit ? (
+          <p className="field-help" id={ids.nameHelp}>
+            Kdyby se něco změnilo, stačí formulář vyplnit znovu se stejným jménem.
+          </p>
+        ) : null}
         <input
           id={ids.name}
           className="input"
@@ -288,41 +295,44 @@ export function RsvpForm({
           value={values.fullName}
           onChange={(e) => update("fullName", e.target.value)}
           aria-invalid={errors.fullName ? true : undefined}
-          aria-describedby={describedBy(errors.fullName && ids.err("fullName"))}
+          aria-describedby={describedBy(!isEdit && ids.nameHelp, errors.fullName && ids.err("fullName"))}
         />
         <FieldError id={ids.err("fullName")} message={errors.fullName} />
       </div>
 
-      <div className="field">
-        <label className="field-label" htmlFor={ids.email}>
-          E-mail
-        </label>
-        <p className="field-help" id={ids.emailHelp}>
-          {isEdit
-            ? "E-mail změnit nejde — je na něj navázaný tenhle odkaz. Potřebuješ jiný? Napiš nám odpovědí na e-mail s odkazem."
-            : emailEnabled
-              ? "Pošleme ti na něj potvrzení. Když se něco změní, stačí formulář vyplnit znovu."
-              : "Kdyby se něco změnilo, stačí formulář vyplnit znovu se stejným jménem a e-mailem."}
-        </p>
-        <input
-          id={ids.email}
-          className="input"
-          name="email"
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          autoCapitalize="off"
-          spellCheck={false}
-          maxLength={254}
-          required={!isEdit}
-          readOnly={isEdit}
-          value={values.email}
-          onChange={(e) => update("email", e.target.value)}
-          aria-invalid={errors.email ? true : undefined}
-          aria-describedby={describedBy(ids.emailHelp, errors.email && ids.err("email"))}
-        />
-        <FieldError id={ids.err("email")} message={errors.email} />
-      </div>
+      {/* only the edit page (old answers with a link) still shows the address */}
+      {isEdit ? (
+        <div className="field">
+          <label className="field-label" htmlFor={ids.email}>
+            E-mail
+          </label>
+          <p className="field-help" id={ids.emailHelp}>
+            {isEdit
+              ? "E-mail změnit nejde — je na něj navázaný tenhle odkaz. Potřebuješ jiný? Napiš nám odpovědí na e-mail s odkazem."
+              : emailEnabled
+                ? "Pošleme ti na něj potvrzení. Když se něco změní, stačí formulář vyplnit znovu."
+                : "Kdyby se něco změnilo, stačí formulář vyplnit znovu se stejným jménem a e-mailem."}
+          </p>
+          <input
+            id={ids.email}
+            className="input"
+            name="email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="off"
+            spellCheck={false}
+            maxLength={254}
+            required={!isEdit}
+            readOnly={isEdit}
+            value={values.email}
+            onChange={(e) => update("email", e.target.value)}
+            aria-invalid={errors.email ? true : undefined}
+            aria-describedby={describedBy(ids.emailHelp, errors.email && ids.err("email"))}
+          />
+          <FieldError id={ids.err("email")} message={errors.email} />
+        </div>
+      ) : null}
 
       <fieldset className="choices" aria-invalid={errors.attendance ? true : undefined}>
         <legend>Dorazíš?</legend>

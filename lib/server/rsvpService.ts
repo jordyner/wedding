@@ -75,7 +75,10 @@ export async function submitRsvp(
     return { status: "error", reason: "bad_request" };
   }
 
-  const validated = validateRsvp(body);
+  // The form asks only for a name, so a guest is their name and answering again replaces
+  // the answer. An email, if one is sent, is still validated, stored and used.
+  const hasEmail = typeof body.email === "string" && body.email.trim() !== "";
+  const validated = validateRsvp(body, { requireEmail: hasEmail });
   if (!validated.ok) return { status: "invalid", errors: validated.errors };
   const input = validated.value;
   await ensureSchema(db);
@@ -141,7 +144,7 @@ export async function sendLinkEmail(
   kind: "confirmation" | "duplicate",
 ): Promise<EmailOutcome> {
   const { db, mailer, siteUrl } = deps;
-  if (deps.emailOff) return "off";
+  if (deps.emailOff || !row.email) return "off";
   const force = kind === "duplicate";
 
   const claimed = await db.query<ResponseRow>(

@@ -101,6 +101,16 @@ describe("submitRsvp", () => {
     expect((await db.query("select * from rsvp_edit_tokens")).rows).toHaveLength(0);
   });
 
+  it("accepts a name-only answer, and the same name answering again replaces it", async () => {
+    const first = await submitRsvp(deps(), answer({ email: undefined }), ip);
+    expect(first).toEqual({ status: "saved", email: "off" });
+    await submitRsvp(deps(), answer({ email: undefined, fullName: "jiri  JORDAN", attendance: "no" }), ip);
+    const r = await rows();
+    expect(r).toHaveLength(1);
+    expect(r[0]).toMatchObject({ full_name: "jiri JORDAN", email: "", attendance: "no" });
+    expect(mailer.sent).toHaveLength(0);
+  });
+
   it("treats a retried request as the same submission (no duplicate row, no second email)", async () => {
     const body = answer();
     await submitRsvp(deps(), body, ip);
