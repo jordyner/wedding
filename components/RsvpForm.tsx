@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
 import {
   ATTENDANCE,
@@ -71,6 +71,8 @@ export function RsvpForm({
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState<{ tone: "error" | "success"; text: ReactNode } | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
+  // Without email there is nothing more to say than "saved": a small dialog, and the form stays.
+  const [thanks, setThanks] = useState(false);
 
   // One id per filled-in form: a retried or double-sent request resolves to the same record.
   const submissionId = useRef<string | null>(null);
@@ -160,6 +162,12 @@ export function RsvpForm({
     switch (data.status) {
       case "saved":
       case "duplicate":
+        if (data.email === "off") {
+          // The next send is a new answer (the latest one counts), not a retry of this one.
+          submissionId.current = null;
+          setThanks(true);
+          return;
+        }
         setOutcome({ kind: data.status, email: data.email, address: values.email.trim() });
         requestAnimationFrame(() => doneRef.current?.focus());
         return;
@@ -352,7 +360,39 @@ export function RsvpForm({
           {status?.text}
         </p>
       </div>
+      {thanks ? <ThanksDialog onClose={() => setThanks(false)} /> : null}
     </form>
+  );
+}
+
+/** "Saved" as a small modal with the postmark. Esc, the button or a click outside closes it. */
+function ThanksDialog({ onClose }: { onClose: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  useEffect(() => {
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+  }, []);
+  return (
+    <dialog
+      ref={ref}
+      className="thanks"
+      aria-labelledby={titleId}
+      data-testid="rsvp-thanks"
+      onClose={onClose}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) ref.current?.close();
+      }}
+    >
+      <Postmark />
+      <h2 className="reply-title" id={titleId}>
+        Díky, že dáváš vědět!
+      </h2>
+      <p>Odpověď jsme uložili.</p>
+      <button type="button" className="btn" onClick={() => ref.current?.close()} autoFocus>
+        Zavřít
+      </button>
+    </dialog>
   );
 }
 
