@@ -123,6 +123,9 @@ export function InvitationExperience({
     // travels back up by the same amount, so the edge uncovers it and every frame is a
     // compositor-only transform (no per-frame clip, style or paint work on the main thread).
     const clipBox = cardEl.parentElement as HTMLElement;
+    // The wrapper travelling down must not make the page taller for a moment: a page that
+    // grows and shrinks back makes phones jump (scrollbar, toolbar, rubber-band).
+    const sheet = cardEl.closest<HTMLElement>(".sheet");
     const clip = `inset(-100vh -80px ${final.bottom - handoff.env.bottom}px -80px)`;
     const setClip = (value: string) => {
       clipBox.style.clipPath = value;
@@ -136,6 +139,7 @@ export function InvitationExperience({
     cardEl.style.transformOrigin = "0 0";
     cardEl.style.transform = from;
     setClip(clip);
+    if (sheet) sheet.style.overflowY = "clip";
 
     // Stage 1: the envelope is drawn away downward, gathering speed (ease-in cubic).
     const slide = { duration: SLIDE_MS, easing: "cubic-bezier(0.32, 0, 0.67, 0)", fill: "forwards" as const };
@@ -159,6 +163,7 @@ export function InvitationExperience({
         back.style.visibility = front.style.visibility = "hidden";
         setClip("");
         stage1.forEach((a) => a.cancel());
+        if (sheet) sheet.style.overflowY = "";
         cardEl.style.transform = "";
         cardEl.style.transformOrigin = "";
         settle = cardEl.animate(
@@ -186,6 +191,7 @@ export function InvitationExperience({
       stage1.forEach((a) => a.cancel());
       settle?.cancel();
       setClip("");
+      if (sheet) sheet.style.overflowY = "";
       cardEl.style.transform = "";
       cardEl.style.transformOrigin = "";
       cardEl.style.transition = "";
