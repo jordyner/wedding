@@ -3,13 +3,12 @@ export function ReplyNotes() {
   return (
     <div className="notes">
       <p>
-        <span className="runin">Bez doprovodu</span>
-        Svatbu plánujeme v kruhu pozvaných, proto prosíme bez dalšího doprovodu. Děkujeme, že to respektuješ. Pokud
-        jste pozvaní ve dvou, odpovídá každý sám za sebe.
+        Máme pevně omezenou kapacitu a moc bychom si přáli náš den strávit se všemi našimi blízkými. Proto jsme se
+        rozhodli pozvat každého bez dalšího doprovodu. Pozvání tedy platí pouze pro tebe.
       </p>
       <p>
-        <span className="runin">Ubytování</span>
-        Na obě noci máme ubytování rezervované a zaplacené i pro tebe. Stačí nám dát vědět, které noci využiješ.
+        Pro všechny hosty máme zajištěné ubytování v apartmánech ze soboty na neděli. Budeme rádi, když ho využiješ,
+        ale rozhodnutí je samozřejmě na tobě.
       </p>
     </div>
   );

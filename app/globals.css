@@ -33,6 +33,8 @@
 
   /* side space between the screen edge and the paper */
   --gutter: 1rem;
+  /* width of the invitation card (and the reply card under it) */
+  --card-w: 34rem;
   /* space above the open card */
   --sheet-top: clamp(1rem, 3.5vw, 2.25rem);
 
@@ -149,6 +151,13 @@ a:hover {
   padding: var(--pad-top) var(--gutter) var(--pad-bottom);
 }
 
+/* The open card and its reply button take one screen; in a taller window they sit
+   centred instead of hugging the top. */
+.first-screen {
+  min-height: calc(100svh - var(--pad-top) - 1.25rem - env(safe-area-inset-bottom, 0px));
+  display: grid;
+  align-content: center;
+}
 /* short standalone notes (private, not found): centred, a touch above the middle */
 .page-center {
   display: grid;
@@ -156,7 +165,7 @@ a:hover {
   padding-bottom: calc(var(--pad-bottom) + 8svh);
 }
 .sheet {
-  width: min(100%, 34rem);
+  width: min(100%, var(--card-w));
   margin-inline: auto;
 }
 /* the open card sits a little higher than the envelope did */
@@ -287,7 +296,7 @@ a:hover {
   top: 0;
   left: 0;
   display: block;
-  width: min(100vw - 2 * var(--gutter), 34rem);
+  width: min(100vw - 2 * var(--gutter), var(--card-w));
   transform: scale(var(--mini-scale, 0.8));
   transform-origin: 0 0;
   box-shadow: none;
@@ -620,6 +629,7 @@ a:hover {
 .is-revealing .inv-address {
   animation-delay: 790ms;
 }
+
 .ornament .draw {
   stroke-dasharray: 1;
 }
@@ -661,11 +671,11 @@ a:hover {
   text-wrap: balance;
 }
 .inv-names .amp {
+  /* "a" in the same hand as the names, smaller and in the accent colour */
   display: block;
-  margin: 0.08em 0 0.02em;
-  font-family: var(--font-serif), serif;
-  font-style: italic;
-  font-size: 0.42em;
+  margin: 0.02em 0 0.06em;
+  font-family: var(--font-script), cursive;
+  font-size: 0.6em;
   line-height: 1;
   color: var(--accent);
 }
@@ -717,6 +727,35 @@ a:hover {
 .inv-address {
   font-size: 1.0625rem;
   color: var(--ink-soft);
+}
+
+/* A larger card on a big screen, when the window is tall enough to keep the card
+   and its reply button on one screen. */
+@media (min-width: 48rem) and (min-height: 52rem) {
+  :root {
+    --card-w: 38rem;
+  }
+  .invitation {
+    padding: 5.5rem 4.5rem 5rem;
+  }
+  .inv-opening {
+    font-size: 1.8125rem;
+  }
+  .inv-names {
+    font-size: 4.75rem;
+  }
+  .inv-invite {
+    font-size: 1.5rem;
+  }
+  .ornament {
+    width: 10rem;
+  }
+  .inv-date {
+    font-size: 1.625rem;
+  }
+  .inv-venue {
+    font-size: 1.3125rem;
+  }
 }
 
 .respond {
@@ -882,28 +921,37 @@ a:hover {
 }
 
 .notes {
-  margin: clamp(1.75rem, 6vw, 2.25rem) 0 0;
-  padding: 1.5rem 0 0.25rem;
-  border-top: 1px solid var(--blush-line);
+  margin: clamp(1.5rem, 5vw, 2rem) 0 0;
   display: grid;
   gap: 1rem;
+}
+/* a short hairline between the intro and the notes */
+.notes::before {
+  content: "";
+  justify-self: center;
+  width: 4.5rem;
+  height: 1px;
+  margin-bottom: 0.5rem;
+  background: var(--blush-line);
+}
+/* one small diamond between the notes and the form */
+.notes::after {
+  content: "";
+  justify-self: center;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-top: 1rem;
+  border: 1px solid var(--blush-line);
+  transform: rotate(45deg);
 }
 .notes p {
   margin: 0;
   font-size: 1.0625rem;
   text-wrap: pretty;
 }
-.notes .runin {
-  font-variant-caps: all-small-caps;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-  margin-right: 0.35em;
-}
 
 .form {
   margin-top: 1.75rem;
-  padding-top: 1.75rem;
-  border-top: 1px solid var(--blush-line);
   display: grid;
   gap: 1.75rem;
 }

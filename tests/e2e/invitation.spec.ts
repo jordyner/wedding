@@ -39,7 +39,7 @@ test.describe("envelope", () => {
     const card = page.getByTestId("invitation");
     await expect(card.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(card).toContainText("Budeme se brát!");
-    await expect(card).toContainText("A budeme rádi, když u toho budeš s námi.");
+    await expect(card).toContainText("A chceme tě u toho mít.");
     await expect(card).toBeFocused();
 
     const bodySize = await card.locator(".inv-invite").evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
@@ -121,7 +121,7 @@ test.describe("RSVP reveal", () => {
     const replyBox = (await reply.boundingBox())!;
     expect(replyBox.y).toBeGreaterThan(card.y + card.height);
 
-    await expect(reply).toContainText("Zatím jde o předběžné potvrzení");
+    await expect(reply).toContainText("Teď nám stačí jen vědět, jestli dorazíš");
     await expect(reply).toContainText("prosíme bez dalšího doprovodu");
     await expect(reply).toContainText("rezervované a zaplacené i pro tebe");
     await expect(page.getByLabel("Jméno a příjmení")).toBeVisible();

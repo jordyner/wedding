@@ -113,8 +113,8 @@ export function validateRsvp(input: Record<string, unknown>, opts: { requireEmai
 }
 
 export const attendanceLabel: Record<Attendance, string> = {
-  yes: "Ano, rád/a",
-  no: "Bohužel ne",
+  yes: "Ano",
+  no: "Ne",
   undecided: "Zatím nevím",
 };
 

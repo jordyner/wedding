@@ -1,8 +1,20 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { event } from "@/content/event";
-import { Envelope, EnvelopeBack, EnvelopeDefs, EnvelopeFlap, EnvelopePocket } from "./Envelope";
+import {
+  Envelope,
+  EnvelopeBack,
+  EnvelopeDefs,
+  EnvelopeFlap,
+  EnvelopePocket,
+} from "./Envelope";
 import { RsvpForm } from "./RsvpForm";
 import { WaxSealDefs } from "./WaxSeal";
 import { useTilt } from "./useTilt";
@@ -17,14 +29,23 @@ const SLIDE_MS = 460;
 const SETTLE_MS = 760;
 
 function prefersReducedMotion() {
-  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 }
 
 /**
  * closed envelope → opening → invitation card → reply card (on request).
  * The phase only moves forward, so repeated taps cannot restart or break the animation.
  */
-export function InvitationExperience({ card, notes }: { card: ReactNode; notes: ReactNode }) {
+export function InvitationExperience({
+  card,
+  notes,
+}: {
+  card: ReactNode;
+  notes: ReactNode;
+}) {
   const [phase, setPhase] = useState<Phase>("closed");
   const [animate, setAnimate] = useState(true);
   const [handoff, setHandoff] = useState<Handoff | null>(null);
@@ -81,12 +102,19 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
     const s = handoff.mini.width / final.width;
     const from = `translate(${handoff.mini.left - final.left}px, ${handoff.mini.top - final.top}px) scale(${s})`;
     // Bottom of the card that was still inside the pocket, in card pixels.
-    const hiddenStart = Math.max(0, final.height - (handoff.env.bottom - handoff.mini.top) / s);
+    const hiddenStart = Math.max(
+      0,
+      final.height - (handoff.env.bottom - handoff.mini.top) / s,
+    );
     // The envelope travels off-screen and at least far enough to uncover the whole card.
     // (+ the open flap, which stands above the envelope's top edge).
-    const distance = Math.max(window.innerHeight - handoff.env.top + handoff.env.height * 0.6 + 40, hiddenStart * s + 40);
+    const distance = Math.max(
+      window.innerHeight - handoff.env.top + handoff.env.height * 0.6 + 40,
+      hiddenStart * s + 40,
+    );
     const setClip = (bottom: number | null) => {
-      const value = bottom === null ? "" : `inset(-80px -80px ${bottom}px -80px)`;
+      const value =
+        bottom === null ? "" : `inset(-80px -80px ${bottom}px -80px)`;
       cardEl.style.clipPath = value;
       cardEl.style.setProperty("-webkit-clip-path", value);
     };
@@ -106,7 +134,8 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
       if (cancelled) return;
       const t = Math.min(1, (now - start) / SLIDE_MS);
       const travelled = distance * t * t * t; // ease-in: the envelope gathers speed
-      back.style.transform = front.style.transform = `translateY(${travelled}px)`;
+      back.style.transform =
+        front.style.transform = `translateY(${travelled}px)`;
       setClip(Math.max(0, hiddenStart - travelled / s));
       if (t < 1) {
         frame = requestAnimationFrame(step);
@@ -132,7 +161,8 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
           setSettled(true);
           // Don't pull focus back if the guest has already moved on (e.g. into the reply form).
           const active = document.activeElement;
-          if (!active || active === document.body) cardEl.focus({ preventScroll: true });
+          if (!active || active === document.body)
+            cardEl.focus({ preventScroll: true });
         })
         .catch(() => {});
     };
@@ -158,7 +188,12 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
     replyTitleRef.current?.focus({ preventScroll: true });
     if (!reply) return;
     let top = 0;
-    for (let el: HTMLElement | null = reply; el; el = el.offsetParent as HTMLElement | null) top += el.offsetTop;
+    for (
+      let el: HTMLElement | null = reply;
+      el;
+      el = el.offsetParent as HTMLElement | null
+    )
+      top += el.offsetTop;
     const margin = parseFloat(getComputedStyle(reply).scrollMarginTop) || 0;
     window.scrollTo({ top: top - margin, behavior: "instant" });
   }
@@ -168,7 +203,12 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
   }, [replyOpen]);
 
   const ghostStyle = handoff
-    ? { left: handoff.env.left, top: handoff.env.top, width: handoff.env.width, height: handoff.env.height }
+    ? {
+        left: handoff.env.left,
+        top: handoff.env.top,
+        width: handoff.env.width,
+        height: handoff.env.height,
+      }
     : undefined;
 
   return (
@@ -178,7 +218,12 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
 
       {phase !== "open" ? (
         <div className={`envelope-stage is-${phase}`} data-phase={phase}>
-          <Envelope disabled={phase !== "closed"} onOpen={open} envelopeRef={envelopeRef} miniRef={miniRef} />
+          <Envelope
+            disabled={phase !== "closed"}
+            onOpen={open}
+            envelopeRef={envelopeRef}
+            miniRef={miniRef}
+          />
           <p className="envelope-hint" aria-hidden="true">
             {event.copy.envelopeHint}
           </p>
@@ -186,42 +231,55 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
       ) : (
         <div className="sheet" data-phase="open">
           {handoff ? (
-            <div className="envelope-ghost is-back" style={ghostStyle} ref={ghostBackRef} aria-hidden="true">
+            <div
+              className="envelope-ghost is-back"
+              style={ghostStyle}
+              ref={ghostBackRef}
+              aria-hidden="true"
+            >
               <EnvelopeBack />
               <EnvelopeFlap open />
             </div>
           ) : null}
 
-          <div className="card-tilt" ref={tiltRef}>
-            <article
-              ref={cardRef}
-              className={`paper invitation${animate ? " is-revealing" : ""}`}
-              aria-labelledby="invitation-title"
-              tabIndex={-1}
-              data-testid="invitation"
-            >
-              {card}
-              <span className="sheen" aria-hidden="true" />
-            </article>
-          </div>
-
-          {handoff ? (
-            <div className="envelope-ghost is-front" style={ghostStyle} ref={ghostFrontRef} aria-hidden="true">
-              <EnvelopePocket />
+          {/* card + reply button: one screen, centred vertically when the window is taller */}
+          <div className="first-screen">
+            <div className="card-tilt" ref={tiltRef}>
+              <article
+                ref={cardRef}
+                className={`paper invitation${animate ? " is-revealing" : ""}`}
+                aria-labelledby="invitation-title"
+                tabIndex={-1}
+                data-testid="invitation"
+              >
+                {card}
+                <span className="sheen" aria-hidden="true" />
+              </article>
             </div>
-          ) : null}
 
-          {/* Always visible; once the reply card is open it takes the guest back to it. */}
-          <div className={`respond${animate ? " is-entering" : ""}`}>
-            <button
-              type="button"
-              className="btn"
-              onClick={() => (replyOpen ? goToReply() : setReplyOpen(true))}
-              aria-expanded={replyOpen}
-              aria-controls="odpoved"
-            >
-              {event.copy.rsvpButton}
-            </button>
+            {handoff ? (
+              <div
+                className="envelope-ghost is-front"
+                style={ghostStyle}
+                ref={ghostFrontRef}
+                aria-hidden="true"
+              >
+                <EnvelopePocket />
+              </div>
+            ) : null}
+
+            {/* Always visible; once the reply card is open it takes the guest back to it. */}
+            <div className={`respond${animate ? " is-entering" : ""}`}>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => (replyOpen ? goToReply() : setReplyOpen(true))}
+                aria-expanded={replyOpen}
+                aria-controls="odpoved"
+              >
+                {event.copy.rsvpButton}
+              </button>
+            </div>
           </div>
 
           {replyOpen ? (
@@ -232,11 +290,17 @@ export function InvitationExperience({ card, notes }: { card: ReactNode; notes: 
               aria-labelledby="reply-title"
               data-testid="reply"
             >
-              <h2 className="reply-title" id="reply-title" ref={replyTitleRef} tabIndex={-1}>
+              <h2
+                className="reply-title"
+                id="reply-title"
+                ref={replyTitleRef}
+                tabIndex={-1}
+              >
                 Dáš nám vědět?
               </h2>
               <p className="reply-lede">
-                Zatím jde o předběžné potvrzení. Finální účast a podrobnosti si ověříme později.
+                Teď nám stačí jen vědět, jestli dorazíš. Všechny ostatní
+                podrobnosti se dozvíš brzy.
               </p>
               {notes}
               <RsvpForm mode={{ kind: "create" }} titleId="reply-title" />

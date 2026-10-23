@@ -102,15 +102,15 @@ describe("submitRsvp", () => {
     expect(mailer.sent).toHaveLength(1);
   });
 
-  it("never overwrites an existing response for the same person; sends that inbox a link instead", async () => {
+  it("lets the same person answer again; the latest answer replaces the old one", async () => {
     await submitRsvp(deps(), answer(), ip);
     const res = await submitRsvp(deps(), answer({ fullName: "jiri  JORDAN", email: "JIRI@example.com", attendance: "no" }), ip);
-    expect(res).toEqual({ status: "duplicate", email: "sent" });
+    expect(res).toEqual({ status: "saved", email: "sent" });
     const r = await rows();
     expect(r).toHaveLength(1);
-    expect(r[0]).toMatchObject({ attendance: "yes", accommodation: "both" });
+    expect(r[0]).toMatchObject({ attendance: "no", accommodation: null });
+    expect(mailer.sent).toHaveLength(2);
     expect(mailer.sent.at(-1)!.to).toBe("jiri@example.com");
-    expect(mailer.sent.at(-1)!.subject).toMatch(/odkaz/i);
   });
 
   it("keeps different guests who share one inbox as separate responses", async () => {

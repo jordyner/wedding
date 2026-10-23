@@ -278,7 +278,7 @@ export function RsvpForm({ mode, titleId }: { mode: Mode; titleId?: string }) {
         <p className="field-help" id={ids.emailHelp}>
           {isEdit
             ? "E-mail změnit nejde — je na něj navázaný tenhle odkaz. Potřebuješ jiný? Napiš nám odpovědí na e-mail s odkazem."
-            : "Pošleme ti odkaz, přes který můžeš odpověď změnit."}
+            : "Pošleme ti na něj potvrzení. Když se něco změní, stačí formulář vyplnit znovu."}
         </p>
         <input
           id={ids.email}

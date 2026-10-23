@@ -43,11 +43,11 @@ export async function openReply(page: Page) {
 
 export async function fillAnswer(
   page: Page,
-  a: { name: string; email: string; attendance: "Ano, rád/a" | "Bohužel ne" | "Zatím nevím"; nights?: RegExp },
+  a: { name: string; email: string; attendance: "Ano" | "Ne" | "Zatím nevím"; nights?: RegExp },
 ) {
   await page.getByLabel("Jméno a příjmení").fill(a.name);
   await page.getByLabel("E-mail").fill(a.email);
-  await page.getByRole("radio", { name: a.attendance }).check();
+  await page.getByRole("radio", { name: a.attendance, exact: true }).check();
   if (a.nights) await page.getByRole("radio", { name: a.nights }).check();
 }
 

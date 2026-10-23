@@ -153,10 +153,11 @@ export function Envelope({ disabled, onOpen, envelopeRef, miniRef }: Props) {
     if (!button || !mini) return;
     const measure = () => {
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      // Same width the open card gets: the page minus its side gutters, at most 34rem.
+      // Same width the open card gets: the page minus its side gutters, at most --card-w.
       const page = button.closest(".page");
       const gutter = page ? parseFloat(getComputedStyle(page).paddingLeft) : rem;
-      const cardWidth = Math.min(document.documentElement.clientWidth - 2 * gutter, 34 * rem);
+      const maxWidth = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--card-w")) * rem || 34 * rem;
+      const cardWidth = Math.min(document.documentElement.clientWidth - 2 * gutter, maxWidth);
       mini.style.width = `${cardWidth}px`;
       mini.style.setProperty("--mini-scale", String((button.offsetWidth * 0.86) / cardWidth));
     };

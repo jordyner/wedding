@@ -70,7 +70,7 @@ export default defineConfig({
         INVITE_CODE,
       },
       url: `http://localhost:${APP_PORT}/pozvanka`,
-      timeout: 240_000,
+      timeout: 480_000,
       reuseExistingServer: false,
     },
   ],

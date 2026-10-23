@@ -33,7 +33,7 @@ export const event = {
   copy: {
     envelopeHint: "Klepnutím otevři",
     cardOpening: "Budeme se brát!",
-    cardInvitation: "A budeme rádi, když u toho budeš s námi.",
+    cardInvitation: "A chceme tě u toho mít.",
     rsvpButton: "Dám vám vědět",
   },
 } as const;

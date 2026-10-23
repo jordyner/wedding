@@ -18,7 +18,7 @@ export function InvitationCard({ decorative = false }: { decorative?: boolean })
 
       <H1 className="inv-names" id={decorative ? undefined : "invitation-title"}>
         <span className="name name-1">{event.couple.first}</span>
-        <span className="amp">&amp;</span>
+        <span className="amp">a</span>
         <span className="name name-2">{event.couple.second}</span>
       </H1>
 

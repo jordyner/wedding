@@ -95,13 +95,17 @@ export async function submitRsvp(
   const raced = await findBySubmission(db, submissionId);
   if (raced) return { status: "saved", email: await sendLinkEmail(deps, raced, "confirmation") };
 
-  // Same person already answered. Do not overwrite; send their inbox a way back in.
-  const existing = await db.query<ResponseRow>(
-    `select * from rsvp_responses where email_key = $1 and name_key = $2`,
-    [emailKey(input.email), nameKey(input.fullName)],
+  // Same person (same inbox and name) answered before: the latest answer counts.
+  // Guests are told they can simply fill the form in again if something changes.
+  const updated = await db.query<ResponseRow>(
+    `update rsvp_responses
+        set full_name = $3, attendance = $4, accommodation = $5, updated_at = now(), email_status = 'pending'
+      where email_key = $1 and name_key = $2
+      returning *`,
+    [emailKey(input.email), nameKey(input.fullName), input.fullName, input.attendance, input.accommodation],
   );
-  if (!existing.rows[0]) throw new Error("insert conflict without a matching row");
-  return { status: "duplicate", email: await sendLinkEmail(deps, existing.rows[0], "duplicate") };
+  if (!updated.rows[0]) throw new Error("insert conflict without a matching row");
+  return { status: "saved", email: await sendLinkEmail(deps, updated.rows[0], "confirmation") };
 }
 
 async function findBySubmission(db: Db, submissionId: string) {

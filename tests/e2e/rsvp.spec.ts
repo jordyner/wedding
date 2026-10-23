@@ -21,11 +21,11 @@ test.describe("form branching and validation", () => {
     await openReply(page);
     const acc = page.getByTestId("accommodation");
     await expect(acc).toHaveCount(0);
-    for (const label of ["Ano, rád/a", "Bohužel ne", "Zatím nevím"]) {
-      await expect(page.getByRole("radio", { name: label })).not.toBeChecked();
+    for (const label of ["Ano", "Ne", "Zatím nevím"]) {
+      await expect(page.getByRole("radio", { name: label, exact: true })).not.toBeChecked();
     }
 
-    await page.getByRole("radio", { name: "Ano, rád/a" }).check();
+    await page.getByRole("radio", { name: "Ano", exact: true }).check();
     await expect(acc).toBeVisible();
     await expect(acc.getByRole("radio")).toHaveCount(4);
     await expect(acc).toContainText("Bez přespání");
@@ -34,12 +34,12 @@ test.describe("form branching and validation", () => {
     await expect(acc).toContainText("Obě noci — [datum 1. noci] a [datum 2. noci]");
     await page.getByRole("radio", { name: /Obě noci/ }).check();
 
-    await page.getByRole("radio", { name: "Bohužel ne" }).check();
+    await page.getByRole("radio", { name: "Ne", exact: true }).check();
     await expect(acc).toHaveCount(0);
     await page.getByRole("radio", { name: "Zatím nevím" }).check();
     await expect(acc).toHaveCount(0);
 
-    await page.getByRole("radio", { name: "Ano, rád/a" }).check();
+    await page.getByRole("radio", { name: "Ano", exact: true }).check();
     for (const r of await acc.getByRole("radio").all()) await expect(r).not.toBeChecked();
   });
 
@@ -61,7 +61,7 @@ test.describe("form branching and validation", () => {
     await expect(page.getByLabel("E-mail")).toHaveAttribute("aria-describedby", /help/);
 
     await page.getByLabel("E-mail").fill("zofie@seznam.cz");
-    await page.getByRole("radio", { name: "Ano, rád/a" }).check();
+    await page.getByRole("radio", { name: "Ano", exact: true }).check();
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
     await expect(page.getByText("Vyber prosím, které noci u nás přespíš — nebo že nepřespíš.")).toBeVisible();
     await expect(page.getByRole("radio", { name: "Bez přespání" })).toBeFocused();
@@ -79,7 +79,7 @@ test.describe("persistence, email and editing", () => {
     test(`saves accommodation "${label}" and the edit link shows it`, async ({ page }) => {
       const email = uniqueEmail(label);
       await openReply(page);
-      await fillAnswer(page, { name: "Ondřej Šťastný", email, attendance: "Ano, rád/a", nights });
+      await fillAnswer(page, { name: "Ondřej Šťastný", email, attendance: "Ano", nights });
       await page.getByRole("button", { name: "Odeslat odpověď" }).click();
       await expect(page.getByTestId("rsvp-done")).toHaveAttribute("data-outcome", "saved:sent");
 
@@ -93,7 +93,7 @@ test.describe("persistence, email and editing", () => {
   test("full journey: submit, receive email, edit the same record", async ({ page }) => {
     const email = uniqueEmail("journey");
     await openReply(page);
-    await fillAnswer(page, { name: "Žofie Řeháková", email, attendance: "Ano, rád/a", nights: /Obě noci/ });
+    await fillAnswer(page, { name: "Žofie Řeháková", email, attendance: "Ano", nights: /Obě noci/ });
     const submit = page.getByRole("button", { name: "Odeslat odpověď" });
     // Double-click must not create two records or two emails.
     await submit.dblclick();
@@ -112,7 +112,7 @@ test.describe("persistence, email and editing", () => {
     const mail = mails[0];
     expect(mail.subject).toBe("Díky za odpověď — odkaz pro případné změny");
     expect(mail.html).toContain("Upravit odpověď");
-    expect(mail.text).toContain("Ano, rád/a");
+    expect(mail.text).toContain("Ano");
     expect(mail.text).toContain("nepřeposílej");
     expect(mail.text).toContain("Před svatbou se ti ještě ozveme");
     const link = editLink(mail);
@@ -139,7 +139,7 @@ test.describe("persistence, email and editing", () => {
     await page.reload();
     await expect(page.getByRole("radio", { name: "Zatím nevím" })).toBeChecked();
     await expect(page.getByTestId("accommodation")).toHaveCount(0);
-    await page.getByRole("radio", { name: "Ano, rád/a" }).check();
+    await page.getByRole("radio", { name: "Ano", exact: true }).check();
     for (const r of await page.getByTestId("accommodation").getByRole("radio").all()) await expect(r).not.toBeChecked();
     await page.getByRole("radio", { name: /Druhá noc/ }).check();
     await page.getByRole("button", { name: "Uložit změny" }).click();
@@ -149,23 +149,22 @@ test.describe("persistence, email and editing", () => {
     expect(await mailsTo(email)).toHaveLength(1);
   });
 
-  test("re-submitting as the same person does not overwrite; the inbox gets a link", async ({ page }) => {
+  test("re-submitting as the same person replaces the earlier answer", async ({ page }) => {
     const email = uniqueEmail("dupe");
     await openReply(page);
-    await fillAnswer(page, { name: "Petr Novák", email, attendance: "Bohužel ne" });
+    await fillAnswer(page, { name: "Petr Novák", email, attendance: "Ne" });
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
     await expect(page.getByTestId("rsvp-done")).toHaveAttribute("data-outcome", "saved:sent");
 
     await openReply(page);
-    await fillAnswer(page, { name: "petr novak", email: email.toUpperCase(), attendance: "Ano, rád/a", nights: /Obě noci/ });
+    await fillAnswer(page, { name: "petr novak", email: email.toUpperCase(), attendance: "Ano", nights: /Obě noci/ });
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
-    await expect(page.getByTestId("rsvp-done")).toHaveAttribute("data-outcome", "duplicate:sent");
-    await expect(page.getByRole("heading", { name: "Tvoji odpověď už máme" })).toBeVisible();
+    await expect(page.getByTestId("rsvp-done")).toHaveAttribute("data-outcome", "saved:sent");
 
     const mails = await mailsTo(email);
     expect(mails).toHaveLength(2);
     await page.goto(editLink(mails[1]));
-    await expect(page.getByRole("radio", { name: "Bohužel ne" })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "Ano", exact: true })).toBeChecked();
   });
 
   test("invalid edit tokens get a friendly dead end with a recovery path", async ({ page }) => {
@@ -206,7 +205,7 @@ test.describe("failure states", () => {
     const email = uniqueEmail("mailfail");
     await failEmail(500);
     await openReply(page);
-    await fillAnswer(page, { name: "Tomáš Černý", email, attendance: "Ano, rád/a", nights: /Bez přespání/ });
+    await fillAnswer(page, { name: "Tomáš Černý", email, attendance: "Ano", nights: /Bez přespání/ });
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
 
     const done = page.getByTestId("rsvp-done");
@@ -232,11 +231,11 @@ test.describe("failure states", () => {
     await page.route("/api/rsvp", (route) =>
       route.fulfill({ status: 503, contentType: "application/json", body: '{"status":"error","reason":"storage"}' }),
     );
-    await fillAnswer(page, { name: "Jana Malá", email: "jana@example.com", attendance: "Bohužel ne" });
+    await fillAnswer(page, { name: "Jana Malá", email: "jana@example.com", attendance: "Ne" });
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
     await expect(page.getByTestId("form-status")).toContainText("nepodařilo uložit");
     await expect(page.getByLabel("Jméno a příjmení")).toHaveValue("Jana Malá");
-    await expect(page.getByRole("radio", { name: "Bohužel ne" })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "Ne", exact: true })).toBeChecked();
     await expect(page.getByRole("button", { name: "Odeslat odpověď" })).toBeEnabled();
   });
 
@@ -253,7 +252,7 @@ test.describe("failure states", () => {
     const email = uniqueEmail("network");
     await openReply(page);
     await page.route("/api/rsvp", (route) => route.abort("internetdisconnected"));
-    await fillAnswer(page, { name: "Karel Bílý", email, attendance: "Ano, rád/a", nights: /První noc/ });
+    await fillAnswer(page, { name: "Karel Bílý", email, attendance: "Ano", nights: /První noc/ });
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
     await expect(page.getByTestId("form-status")).toContainText("Nepodařilo se spojit se serverem");
     await expect(page.getByRole("radio", { name: /První noc/ })).toBeChecked();
@@ -272,7 +271,7 @@ test.describe("failure states", () => {
       await gate;
       await route.continue();
     });
-    await fillAnswer(page, { name: "Eliška Krátká", email: uniqueEmail("slow"), attendance: "Bohužel ne" });
+    await fillAnswer(page, { name: "Eliška Krátká", email: uniqueEmail("slow"), attendance: "Ne" });
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
     const busy = page.getByRole("button", { name: "Odesílám…" });
     await expect(busy).toBeDisabled();
@@ -296,7 +295,7 @@ test.describe("failure states", () => {
     }
     await page.setExtraHTTPHeaders({ "x-real-ip": ip });
     await openReply(page);
-    await fillAnswer(page, { name: "Pozdní Host", email: uniqueEmail("late"), attendance: "Bohužel ne" });
+    await fillAnswer(page, { name: "Pozdní Host", email: uniqueEmail("late"), attendance: "Ne" });
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
     await expect(page.getByTestId("form-status")).toContainText("Zkus to prosím za pár minut");
     await expect(page.getByLabel("Jméno a příjmení")).toHaveValue("Pozdní Host");
@@ -319,7 +318,7 @@ test.describe("responsive", () => {
       await page.goto("/pozvanka");
       await expectNoHorizontalOverflow(page);
       await openReply(page);
-      await page.getByRole("radio", { name: "Ano, rád/a" }).check();
+      await page.getByRole("radio", { name: "Ano", exact: true }).check();
       await page.getByRole("button", { name: "Odeslat odpověď" }).click();
       await expectNoHorizontalOverflow(page);
       for (const r of await page.getByRole("radio").all()) {
