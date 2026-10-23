@@ -421,7 +421,7 @@ function Done({
     heading = "Díky, že dáváš vědět!";
     body =
       outcome.email === "off" ? (
-        <p>Odpověď jsme uložili. Kdyby se něco změnilo, stačí formulář vyplnit znovu — platí ta poslední.</p>
+        <p>Odpověď jsme uložili.</p>
       ) : outcome.email === "sent" ? (
         <p>Odpověď jsme uložili a na e-mail {address} ti posíláme odkaz pro případné změny.</p>
       ) : outcome.email === "sending" ? (
@@ -489,7 +489,7 @@ function Done({
             <Link href="/odpoved">Ztracený odkaz</Link>.
           </p>
         </div>
-      ) : (
+      ) : outcome.email === "off" ? null : (
         <p className="soft">Zatím je vše předběžné — před svatbou si účast ještě potvrdíme.</p>
       )}
     </div>
