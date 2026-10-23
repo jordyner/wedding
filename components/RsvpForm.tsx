@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
   ATTENDANCE,
@@ -73,8 +74,8 @@ export function RsvpForm({
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState<{ tone: "error" | "success"; text: ReactNode } | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
-  // Without email there is nothing more to say than "saved": the form clears and the
-  // send button says so for a few seconds.
+  // Without email there is nothing more to say than "saved": the form clears and a short
+  // note shows in the middle of the screen for a few seconds.
   const [savedNote, setSavedNote] = useState(0);
   useEffect(() => {
     if (!savedNote) return;
@@ -360,13 +361,6 @@ export function RsvpForm({
             </>
           ) : isEdit ? (
             "Uložit změny"
-          ) : savedNote ? (
-            <span className="btn-saved" key={savedNote}>
-              <svg viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Uloženo, díky!
-            </span>
           ) : (
             "Odeslat odpověď"
           )}
@@ -378,9 +372,24 @@ export function RsvpForm({
         >
           {status?.text}
         </p>
-        <p className="sr-only" role="status" data-testid="rsvp-saved">
+        {/* always present, so screen readers reliably announce the change */}
+        <p className="sr-only" role="status">
           {savedNote ? "Díky! Odpověď jsme uložili." : ""}
         </p>
+        {/* on <body>: the reply card's animation would otherwise pin a fixed element to the card */}
+        {savedNote
+          ? createPortal(
+              <p className="saved-toast" aria-hidden="true" data-testid="rsvp-saved">
+                <span key={savedNote}>
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Díky! Odpověď jsme uložili.
+                </span>
+              </p>,
+              document.body,
+            )
+          : null}
       </div>
     </form>
   );
