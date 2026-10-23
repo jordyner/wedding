@@ -1,7 +1,7 @@
 import "server-only";
 import { after, NextResponse } from "next/server";
 import { getDb, StorageUnavailableError } from "./db";
-import { getMailer } from "./mailer";
+import { emailConfigured, getMailer } from "./mailer";
 import type { Deps, OnSaved } from "./rsvpService";
 import { pushToSheet, sheetConfigured } from "./sheet";
 
@@ -20,7 +20,7 @@ export function siteUrl(): string {
 }
 
 export function deps(): Deps {
-  return { db: getDb(), mailer: getMailer(), siteUrl: siteUrl(), onSaved: sheetHook() };
+  return { db: getDb(), mailer: getMailer(), siteUrl: siteUrl(), onSaved: sheetHook(), emailOff: !emailConfigured() };
 }
 
 /** Mirrors saved answers to the Google Sheet after the response is sent (see lib/server/sheet.ts). */

@@ -42,9 +42,12 @@ function prefersReducedMotion() {
 export function InvitationExperience({
   card,
   notes,
+  emailEnabled = true,
 }: {
   card: ReactNode;
   notes: ReactNode;
+  /** false while the site runs without email: the form then never promises one */
+  emailEnabled?: boolean;
 }) {
   const [phase, setPhase] = useState<Phase>("closed");
   const [animate, setAnimate] = useState(true);
@@ -350,7 +353,7 @@ export function InvitationExperience({
                 podrobnosti se dozvíš brzy.
               </p>
               {notes}
-              <RsvpForm mode={{ kind: "create" }} titleId="reply-title" />
+              <RsvpForm mode={{ kind: "create" }} titleId="reply-title" emailEnabled={emailEnabled} />
             </section>
           ) : null}
         </div>

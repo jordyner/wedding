@@ -11,6 +11,11 @@ export type MailResult = { ok: true; id: string } | { ok: false; error: string }
 
 export type Mailer = { send(message: MailMessage): Promise<MailResult> };
 
+/** Emails are optional: without Resend settings the site saves answers and never mentions email. */
+export function emailConfigured(): boolean {
+  return Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
+}
+
 /**
  * Resend over plain REST (no SDK). `RESEND_API_URL` exists only so automated tests
  * can point at a local mock; production uses the default.

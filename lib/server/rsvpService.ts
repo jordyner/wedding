@@ -30,7 +30,7 @@ import { createToken, fingerprint, hashToken, isWellFormedToken } from "./tokens
  * - A different name with the same email is a different guest (shared inboxes are fine).
  * - A browser retry carries the same submissionId and resolves to the original record.
  */
-export type Deps = { db: Db; mailer: Mailer; siteUrl: string; onSaved?: OnSaved };
+export type Deps = { db: Db; mailer: Mailer; siteUrl: string; onSaved?: OnSaved; emailOff?: boolean };
 /** Called once an answer is stored (new, replaced or edited), e.g. to mirror it to a sheet. */
 export type OnSaved = (r: SavedResponse) => void;
 
@@ -152,6 +152,7 @@ export async function sendLinkEmail(
   kind: "confirmation" | "duplicate",
 ): Promise<EmailOutcome> {
   const { db, mailer, siteUrl } = deps;
+  if (deps.emailOff) return "off";
   const force = kind === "duplicate";
 
   const claimed = await db.query<ResponseRow>(

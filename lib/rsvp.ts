@@ -112,7 +112,8 @@ export const attendanceLabel: Record<Attendance, string> = {
 };
 
 /** Shapes of the JSON the API returns to the browser. */
-export type EmailOutcome = "sent" | "failed" | "sending";
+/** "off": the site runs without email (no Resend settings), so nothing was meant to be sent. */
+export type EmailOutcome = "sent" | "failed" | "sending" | "off";
 
 export type SubmitResponse =
   | { status: "saved"; email: EmailOutcome }

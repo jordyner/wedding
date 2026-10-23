@@ -111,6 +111,14 @@ describe("submitRsvp", () => {
     await expect(db.query("update rsvp_responses set attendance = 'no', accommodation = 'first'")).rejects.toThrow();
   });
 
+  it("saves without trying to send anything while email is switched off", async () => {
+    const res = await submitRsvp({ ...deps(), emailOff: true }, answer(), ip);
+    expect(res).toEqual({ status: "saved", email: "off" });
+    expect(await rows()).toHaveLength(1);
+    expect(mailer.sent).toHaveLength(0);
+    expect((await db.query("select * from rsvp_edit_tokens")).rows).toHaveLength(0);
+  });
+
   it("treats a retried request as the same submission (no duplicate row, no second email)", async () => {
     const body = answer();
     await submitRsvp(deps(), body, ip);

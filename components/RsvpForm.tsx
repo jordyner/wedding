@@ -43,7 +43,15 @@ function newSubmissionId() {
   return crypto.randomUUID();
 }
 
-export function RsvpForm({ mode, titleId }: { mode: Mode; titleId?: string }) {
+export function RsvpForm({
+  mode,
+  titleId,
+  emailEnabled = true,
+}: {
+  mode: Mode;
+  titleId?: string;
+  emailEnabled?: boolean;
+}) {
   const formId = useId();
   const ids = {
     name: `${formId}-name`,
@@ -271,7 +279,9 @@ export function RsvpForm({ mode, titleId }: { mode: Mode; titleId?: string }) {
         <p className="field-help" id={ids.emailHelp}>
           {isEdit
             ? "E-mail změnit nejde — je na něj navázaný tenhle odkaz. Potřebuješ jiný? Napiš nám odpovědí na e-mail s odkazem."
-            : "Pošleme ti na něj potvrzení. Když se něco změní, stačí formulář vyplnit znovu."}
+            : emailEnabled
+              ? "Pošleme ti na něj potvrzení. Když se něco změní, stačí formulář vyplnit znovu."
+              : "Kdyby se něco změnilo, stačí formulář vyplnit znovu se stejným jménem a e-mailem."}
         </p>
         <input
           id={ids.email}
@@ -410,7 +420,9 @@ function Done({
   if (outcome.kind === "saved") {
     heading = "Díky, že dáváš vědět!";
     body =
-      outcome.email === "sent" ? (
+      outcome.email === "off" ? (
+        <p>Odpověď jsme uložili. Kdyby se něco změnilo, stačí formulář vyplnit znovu — platí ta poslední.</p>
+      ) : outcome.email === "sent" ? (
         <p>Odpověď jsme uložili a na e-mail {address} ti posíláme odkaz pro případné změny.</p>
       ) : outcome.email === "sending" ? (
         <p>Odpověď jsme uložili. E-mail s odkazem pro změny na {address} se právě odesílá.</p>
