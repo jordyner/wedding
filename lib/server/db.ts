@@ -17,7 +17,9 @@ export function getDb(): Db {
   if (!url) throw new StorageUnavailableError("DATABASE_URL is not configured");
   if (!pool) {
     pool = new Pool({
-      connectionString: url,
+      // Neon's strings say sslmode=require, which pg already treats as verify-full; saying
+      // so explicitly keeps that behaviour and silences pg's deprecation warning.
+      connectionString: url.replace(/sslmode=(prefer|require|verify-ca)\b/, "sslmode=verify-full"),
       max: Number(process.env.DB_POOL_MAX ?? 3),
       idleTimeoutMillis: 5_000,
       connectionTimeoutMillis: 8_000,
