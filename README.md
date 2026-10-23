@@ -16,7 +16,6 @@ Every event fact lives in **`content/event.ts`**. The website and the emails bot
 | `date` | `[den a datum svatby]` |
 | `time` | `[čas obřadu]` (use `""` to hide the time line) |
 | `venue.name`, `venue.address` | `[místo obřadu]`, `[obec / adresa]` (use `""` to hide the address line) |
-| `nights.first`, `nights.second` | `[datum 1. noci]`, `[datum 2. noci]` |
 
 Invitation copy (`copy.*`) is in the same file. The palette is a set of CSS variables at the top of `app/globals.css`.
 
@@ -101,15 +100,7 @@ Removing the redirect later: delete the `redirects()` entry in `next.config.ts` 
 
 `rsvp_responses` has one row per guest: `id`, `full_name`, `email`, `attendance` (`yes` | `no` | `undecided`), `accommodation`, `created_at`, `updated_at`, and the email-delivery fields `email_status`, `email_attempts`, `email_last_attempt_at`, `email_last_error`, `email_message_id`.
 
-Accommodation:
-
-| attendance | accommodation | meaning |
-|---|---|---|
-| `yes` | `none` / `first` / `second` / `both` | coming; explicit choice, where `none` means not staying overnight |
-| `no` | `NULL` | not applicable |
-| `undecided` | `NULL` | decided later |
-
-A database `CHECK` constraint enforces this, so a stale night selection can never be stored.
+Accommodation: the form no longer asks about it (every guest has a room from Saturday to Sunday), so new answers store `NULL`. The column keeps older answers; a `CHECK` constraint allows a value only for `attendance = 'yes'`. An older database that still requires a night choice is upgraded automatically on the first answer after deploy (and by `npm run db:migrate`).
 
 `rsvp_edit_tokens` stores only the SHA-256 **hash** of each edit token. `rate_limits` holds hashed counters, cleaned up after two days.
 
@@ -130,6 +121,17 @@ No admin UI and no endpoint lists responses. Use the database directly.
 - Fix someone's email (see policy below): `update rsvp_responses set email = '<new>', email_key = lower('<new>') where id = '<id>';`
 
 Keep the Neon credentials to the two of you, and use separate Neon roles if anyone else ever needs read access.
+
+## Google Sheets
+
+Every saved answer can also appear in a Google Sheet: one row per guest (name, email, answer, first and last change). If a guest fills in the form again or uses the edit link, their row is updated. The database stays the source of truth: the sheet is written after the guest gets their response, and a failure there never affects them. Answers saved before you set this up are not copied; take them from `rsvp_export`.
+
+1. Open the spreadsheet → **Rozšíření → Apps Script**. Replace everything in the editor with [`integrations/google-sheet.gs`](integrations/google-sheet.gs) and save.
+2. **Project settings** (gear icon) → **Script properties** → add `SECRET` with a long random value (for example the output of `openssl rand -hex 32`).
+3. **Deploy → New deployment** → type **Web app**; *Execute as*: **Me**; *Who has access*: **Anyone**. Authorise it, then copy the **Web app URL** (ends in `/exec`).
+4. In Vercel → Settings → Environment Variables set `GOOGLE_SHEET_WEBHOOK_URL` (that URL) and `GOOGLE_SHEET_SECRET` (the same secret), then redeploy.
+
+The first answer creates the sheet tab **Odpovědi** with headers. "Anyone" only means the URL can be called; without the secret the script ignores the call, and it never returns any data. If you change the script later, use **Deploy → Manage deployments → Edit → New version** so the URL stays the same.
 
 ## Policies
 

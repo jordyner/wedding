@@ -17,30 +17,14 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe("form branching and validation", () => {
-  test("accommodation follows the attendance answer and stale choices are cleared", async ({ page }) => {
+  test("asks only whether the guest comes, with no accommodation question", async ({ page }) => {
     await openReply(page);
-    const acc = page.getByTestId("accommodation");
-    await expect(acc).toHaveCount(0);
     for (const label of ["Ano", "Ne", "Zatím nevím"]) {
       await expect(page.getByRole("radio", { name: label, exact: true })).not.toBeChecked();
     }
-
     await page.getByRole("radio", { name: "Ano", exact: true }).check();
-    await expect(acc).toBeVisible();
-    await expect(acc.getByRole("radio")).toHaveCount(4);
-    await expect(acc).toContainText("Bez přespání");
-    await expect(acc).toContainText("První noc — [datum 1. noci]");
-    await expect(acc).toContainText("Druhá noc — [datum 2. noci]");
-    await expect(acc).toContainText("Obě noci — [datum 1. noci] a [datum 2. noci]");
-    await page.getByRole("radio", { name: /Obě noci/ }).check();
-
-    await page.getByRole("radio", { name: "Ne", exact: true }).check();
-    await expect(acc).toHaveCount(0);
-    await page.getByRole("radio", { name: "Zatím nevím" }).check();
-    await expect(acc).toHaveCount(0);
-
-    await page.getByRole("radio", { name: "Ano", exact: true }).check();
-    for (const r of await acc.getByRole("radio").all()) await expect(r).not.toBeChecked();
+    await expect(page.getByRole("radio")).toHaveCount(3);
+    await expect(page.getByText("Přespíš u nás?")).toHaveCount(0);
   });
 
   test("required fields and email format are validated inline in Czech", async ({ page }) => {
@@ -60,40 +44,15 @@ test.describe("form branching and validation", () => {
     await expect(page.getByLabel("E-mail")).toHaveAttribute("type", "email");
     await expect(page.getByLabel("E-mail")).toHaveAttribute("aria-describedby", /help/);
 
-    await page.getByLabel("E-mail").fill("zofie@seznam.cz");
-    await page.getByRole("radio", { name: "Ano", exact: true }).check();
-    await page.getByRole("button", { name: "Odeslat odpověď" }).click();
-    await expect(page.getByText("Vyber prosím, které noci u nás přespíš — nebo že nepřespíš.")).toBeVisible();
-    await expect(page.getByRole("radio", { name: "Bez přespání" })).toBeFocused();
     await page.screenshot({ path: test.info().outputPath("errors.png"), fullPage: true });
   });
 });
 
 test.describe("persistence, email and editing", () => {
-  for (const [label, nights, expected] of [
-    ["none", /Bez přespání/, "Bez přespání"],
-    ["first", /První noc/, "První noc"],
-    ["second", /Druhá noc/, "Druhá noc"],
-    ["both", /Obě noci/, "Obě noci"],
-  ] as const) {
-    test(`saves accommodation "${label}" and the edit link shows it`, async ({ page }) => {
-      const email = uniqueEmail(label);
-      await openReply(page);
-      await fillAnswer(page, { name: "Ondřej Šťastný", email, attendance: "Ano", nights });
-      await page.getByRole("button", { name: "Odeslat odpověď" }).click();
-      await expect(page.getByTestId("rsvp-done")).toHaveAttribute("data-outcome", "saved:sent");
-
-      const [mail] = await mailsTo(email);
-      expect(mail.text).toContain(expected);
-      await page.goto(editLink(mail));
-      await expect(page.getByRole("radio", { name: nights })).toBeChecked();
-    });
-  }
-
   test("full journey: submit, receive email, edit the same record", async ({ page }) => {
     const email = uniqueEmail("journey");
     await openReply(page);
-    await fillAnswer(page, { name: "Žofie Řeháková", email, attendance: "Ano", nights: /Obě noci/ });
+    await fillAnswer(page, { name: "Žofie Řeháková", email, attendance: "Ano" });
     const submit = page.getByRole("button", { name: "Odeslat odpověď" });
     // Double-click must not create two records or two emails.
     await submit.dblclick();
@@ -128,24 +87,21 @@ test.describe("persistence, email and editing", () => {
     await expect(page.getByLabel("Jméno a příjmení")).toHaveValue("Žofie Řeháková");
     await expect(page.getByLabel("E-mail")).toHaveValue(email);
     await expect(page.getByLabel("E-mail")).toHaveAttribute("readonly", "");
-    await expect(page.getByRole("radio", { name: /Obě noci/ })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "Ano", exact: true })).toBeChecked();
     await page.screenshot({ path: test.info().outputPath("edit.png"), fullPage: true });
 
-    // Switch to undecided: accommodation disappears and is not stored.
+    // Switch to undecided and back: each change is stored on the same record.
     await page.getByRole("radio", { name: "Zatím nevím" }).check();
     await page.getByRole("button", { name: "Uložit změny" }).click();
     await expect(page.getByRole("status").filter({ hasText: "Hotovo, změny jsme uložili." })).toBeVisible();
 
     await page.reload();
     await expect(page.getByRole("radio", { name: "Zatím nevím" })).toBeChecked();
-    await expect(page.getByTestId("accommodation")).toHaveCount(0);
     await page.getByRole("radio", { name: "Ano", exact: true }).check();
-    for (const r of await page.getByTestId("accommodation").getByRole("radio").all()) await expect(r).not.toBeChecked();
-    await page.getByRole("radio", { name: /Druhá noc/ }).check();
     await page.getByRole("button", { name: "Uložit změny" }).click();
     await expect(page.getByText("Hotovo, změny jsme uložili.")).toBeVisible();
     await page.reload();
-    await expect(page.getByRole("radio", { name: /Druhá noc/ })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "Ano", exact: true })).toBeChecked();
     expect(await mailsTo(email)).toHaveLength(1);
   });
 
@@ -157,7 +113,7 @@ test.describe("persistence, email and editing", () => {
     await expect(page.getByTestId("rsvp-done")).toHaveAttribute("data-outcome", "saved:sent");
 
     await openReply(page);
-    await fillAnswer(page, { name: "petr novak", email: email.toUpperCase(), attendance: "Ano", nights: /Obě noci/ });
+    await fillAnswer(page, { name: "petr novak", email: email.toUpperCase(), attendance: "Ano" });
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
     await expect(page.getByTestId("rsvp-done")).toHaveAttribute("data-outcome", "saved:sent");
 
@@ -205,7 +161,7 @@ test.describe("failure states", () => {
     const email = uniqueEmail("mailfail");
     await failEmail(500);
     await openReply(page);
-    await fillAnswer(page, { name: "Tomáš Černý", email, attendance: "Ano", nights: /Bez přespání/ });
+    await fillAnswer(page, { name: "Tomáš Černý", email, attendance: "Ano" });
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
 
     const done = page.getByTestId("rsvp-done");
@@ -252,10 +208,10 @@ test.describe("failure states", () => {
     const email = uniqueEmail("network");
     await openReply(page);
     await page.route("/api/rsvp", (route) => route.abort("internetdisconnected"));
-    await fillAnswer(page, { name: "Karel Bílý", email, attendance: "Ano", nights: /První noc/ });
+    await fillAnswer(page, { name: "Karel Bílý", email, attendance: "Ano" });
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();
     await expect(page.getByTestId("form-status")).toContainText("Nepodařilo se spojit se serverem");
-    await expect(page.getByRole("radio", { name: /První noc/ })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "Ano", exact: true })).toBeChecked();
 
     await page.unroute("/api/rsvp");
     await page.getByRole("button", { name: "Odeslat odpověď" }).click();

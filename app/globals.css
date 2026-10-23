@@ -1230,28 +1230,6 @@ a:hover {
   line-height: 1.35;
 }
 
-.accommodation {
-  padding: 0;
-}
-.accommodation legend {
-  margin-bottom: 0.5rem;
-}
-.accommodation .choice-list {
-  display: grid;
-  gap: 0.15rem;
-  padding-left: 0.85rem;
-  border-left: 1px solid var(--blush-line);
-}
-.accommodation.is-entering {
-  animation: fade-down 360ms var(--ease-out) both;
-}
-@keyframes fade-down {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-}
-
 .form-actions {
   display: grid;
   justify-items: center;

@@ -3,7 +3,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/lib/server/db";
 import type { MailMessage, MailResult, Mailer } from "@/lib/server/mailer";
-import { schemaSql } from "@/lib/server/schema";
+import { relaxAccommodationSql, schemaSql } from "@/lib/server/schema";
 import { getByToken, recoverLinks, submitRsvp, updateByToken } from "@/lib/server/rsvpService";
 import { hashToken, isWellFormedToken } from "@/lib/server/tokens";
 
@@ -33,7 +33,6 @@ const answer = (over: Record<string, unknown> = {}) => ({
   fullName: "Jiří Jordán",
   email: "jiri@example.com",
   attendance: "yes",
-  accommodation: "both",
   ...over,
 });
 
@@ -54,12 +53,13 @@ describe("submitRsvp", () => {
     expect(res).toEqual({ status: "saved", email: "sent" });
 
     const [row] = await rows();
-    expect(row).toMatchObject({ full_name: "Jiří Jordán", attendance: "yes", accommodation: "both", email_status: "sent" });
+    expect(row).toMatchObject({ full_name: "Jiří Jordán", attendance: "yes", accommodation: null, email_status: "sent" });
     expect(row.created_at).toBeInstanceOf(Date);
 
     const mail = mailer.sent[0];
     expect(mail.to).toBe("jiri@example.com");
-    expect(mail.text).toContain("Obě noci");
+    expect(mail.text).toContain("Dorazíš? Ano");
+    expect(mail.text).not.toContain("Ubytování");
     expect(mail.html).toContain("Upravit odpověď");
     expect(mail.idempotencyKey).toMatch(/^rsvp\/.+\/confirmation\/1$/);
 
@@ -71,26 +71,44 @@ describe("submitRsvp", () => {
     expect(mail.text).not.toMatch(/odpoved\/[^\s]*jiri/i);
   });
 
-  it("stores each attendance/accommodation combination distinctly", async () => {
-    for (const [i, a] of [
-      ["yes", "none"],
-      ["yes", "first"],
-      ["yes", "second"],
-      ["yes", "both"],
-      ["no", "both"],
-      ["undecided", "first"],
-    ].entries()) {
-      await submitRsvp(deps(), answer({ email: `g${i}@example.com`, attendance: a[0], accommodation: a[1] }), ip);
+  it("stores each attendance answer distinctly and never an accommodation", async () => {
+    for (const [i, a] of ["yes", "no", "undecided"].entries()) {
+      await submitRsvp(deps(), answer({ email: `g${i}@example.com`, attendance: a, accommodation: "both" }), ip);
     }
     const r = await rows();
     expect(r.map((x) => [x.attendance, x.accommodation])).toEqual([
-      ["yes", "none"],
-      ["yes", "first"],
-      ["yes", "second"],
-      ["yes", "both"],
+      ["yes", null],
       ["no", null],
       ["undecided", null],
     ]);
+  });
+
+  it("reports every stored answer once, for mirroring to the sheet", async () => {
+    const seen: { id: string; fullName: string; attendance: string }[] = [];
+    const withHook = { ...deps(), onSaved: (r: { id: string; fullName: string; attendance: string }) => seen.push(r) };
+    const body = answer();
+    await submitRsvp(withHook, body, ip);
+    await submitRsvp(withHook, body, ip); // a retry is not a new answer
+    await submitRsvp(withHook, answer({ attendance: "no" }), ip); // same person again replaces it
+    const [row] = await rows();
+    expect(seen.map((r) => [r.id, r.fullName, r.attendance])).toEqual([
+      [row.id, "Jiří Jordán", "yes"],
+      [row.id, "Jiří Jordán", "no"],
+    ]);
+
+    const token = mailer.lastToken();
+    await updateByToken(db, { token, fullName: "Jiří Jordán", attendance: "undecided" }, (r) => seen.push(r));
+    expect(seen.at(-1)).toMatchObject({ id: row.id, email: "jiri@example.com", attendance: "undecided" });
+  });
+
+  it("upgrades a database that still has the old night-choice rule", async () => {
+    await pg.exec(`alter table rsvp_responses drop constraint accommodation_only_when_attending;
+      alter table rsvp_responses add constraint accommodation_only_when_attending
+        check ((attendance = 'yes') = (accommodation is not null));`);
+    await pg.exec(relaxAccommodationSql);
+    expect(await submitRsvp(deps(), answer(), ip)).toEqual({ status: "saved", email: "sent" });
+    await pg.exec(relaxAccommodationSql); // a second run changes nothing
+    await expect(db.query("update rsvp_responses set attendance = 'no', accommodation = 'first'")).rejects.toThrow();
   });
 
   it("treats a retried request as the same submission (no duplicate row, no second email)", async () => {
@@ -178,10 +196,10 @@ describe("editing through the private link", () => {
   it("loads exactly the associated response", async () => {
     const t1 = await created();
     await created({ fullName: "Eva Jordánová", email: "eva@example.com", attendance: "no" });
-    expect(await getByToken(db, t1)).toMatchObject({ fullName: "Jiří Jordán", attendance: "yes", accommodation: "both" });
+    expect(await getByToken(db, t1)).toMatchObject({ fullName: "Jiří Jordán", attendance: "yes", accommodation: null });
   });
 
-  it("updates the same record and clears accommodation when no longer attending", async () => {
+  it("updates the same record in place", async () => {
     const token = await created();
     const [before] = await rows();
     await new Promise((r) => setTimeout(r, 15));
@@ -219,12 +237,13 @@ describe("editing through the private link", () => {
 
   it("validates edits on the server", async () => {
     const token = await created();
-    const res = await updateByToken(db, { token, fullName: "Jiří Jordán", attendance: "yes" });
+    const res = await updateByToken(db, { token, fullName: "Jiří Jordán", attendance: "maybe" });
     expect(res.status).toBe("invalid");
   });
 
-  it("the database itself refuses a stale accommodation", async () => {
+  it("the database itself refuses accommodation for a guest who is not attending", async () => {
     await created();
+    await expect(db.query("update rsvp_responses set accommodation = 'first'")).resolves.toBeDefined();
     await expect(db.query("update rsvp_responses set attendance = 'no'")).rejects.toThrow();
   });
 });

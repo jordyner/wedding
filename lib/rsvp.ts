@@ -88,16 +88,9 @@ export function validateRsvp(input: Record<string, unknown>, opts: { requireEmai
     errors.attendance = "Vyber prosím, jestli dorazíš.";
   }
 
-  let accommodation: Accommodation | null = null;
-  if (attendance === "yes") {
-    if (!ACCOMMODATION.includes(input.accommodation as Accommodation)) {
-      errors.accommodation = "Vyber prosím, které noci u nás přespíš — nebo že nepřespíš.";
-    } else {
-      accommodation = input.accommodation as Accommodation;
-    }
-  }
-  // For "no" and "undecided" any submitted accommodation is discarded on purpose,
-  // so a stale choice can never be counted.
+  // The form no longer asks about accommodation (every guest has a room from Saturday
+  // to Sunday), so nothing a client sends is stored; old rows keep their value.
+  const accommodation: Accommodation | null = null;
 
   if (Object.keys(errors).length > 0) return { ok: false, errors };
 

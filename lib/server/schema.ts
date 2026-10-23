@@ -1,12 +1,30 @@
 /**
  * Database schema. Idempotent: safe to run on every deploy (`npm run db:migrate`).
  *
- * Accommodation meaning, derived from attendance:
- *   attendance = 'yes'       -> accommodation is required: none | first | second | both
- *   attendance = 'no'        -> accommodation IS NULL (not applicable)
- *   attendance = 'undecided' -> accommodation IS NULL (decided later)
- * The CHECK constraint makes a stale accommodation choice impossible to store.
+ * Accommodation: the form used to ask which nights a guest would stay. It no longer
+ * does (everyone has a room from Saturday to Sunday), so new rows store NULL. The
+ * column stays for older answers, and only an attending guest can have a value.
  */
+/**
+ * Existing databases: relax the old rule that required a night choice for 'yes'.
+ * Only touches the table while the old rule is still there, so it is cheap to run on
+ * every cold start too (see rsvpService), not just from `npm run db:migrate`.
+ */
+export const relaxAccommodationSql = `
+do $$
+begin
+  if exists (
+    select 1 from pg_constraint
+     where conname = 'accommodation_only_when_attending'
+       and pg_get_constraintdef(oid) not ilike '% or %'
+  ) then
+    alter table rsvp_responses drop constraint accommodation_only_when_attending;
+    alter table rsvp_responses add constraint accommodation_only_when_attending
+      check (attendance = 'yes' or accommodation is null);
+  end if;
+end $$;
+`;
+
 export const schemaSql = `
 create table if not exists rsvp_responses (
   id                     uuid primary key,
@@ -26,8 +44,10 @@ create table if not exists rsvp_responses (
   email_last_error       text,
   email_message_id       text,
   constraint accommodation_only_when_attending
-    check ((attendance = 'yes') = (accommodation is not null))
+    check (attendance = 'yes' or accommodation is null)
 );
+
+${relaxAccommodationSql}
 
 -- One response per person per inbox. Two different people may share an inbox.
 create unique index if not exists rsvp_responses_person

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { emailKey, nameKey, validateRsvp } from "@/lib/rsvp";
 
-const base = { fullName: "Jiří Jordán", email: "jiri@example.com", attendance: "yes", accommodation: "both" };
+const base = { fullName: "Jiří Jordán", email: "jiri@example.com", attendance: "yes", accommodation: null };
 
 describe("validateRsvp", () => {
   it("accepts a complete affirmative answer", () => {
@@ -17,19 +17,11 @@ describe("validateRsvp", () => {
     }
   });
 
-  it("requires an explicit accommodation choice when attending", () => {
-    const r = validateRsvp({ ...base, accommodation: undefined });
-    expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.errors.accommodation).toBeDefined();
-  });
-
-  it.each(["no", "undecided"])("discards a stale accommodation for %s", (attendance) => {
-    const r = validateRsvp({ ...base, attendance, accommodation: "both" });
+  it.each(["yes", "no", "undecided"])("needs no accommodation and stores none for %s", (attendance) => {
+    const r = validateRsvp({ ...base, attendance, accommodation: undefined });
     expect(r.ok && r.value.accommodation).toBe(null);
-  });
-
-  it.each(["none", "first", "second", "both"])("accepts accommodation %s", (accommodation) => {
-    expect(validateRsvp({ ...base, accommodation }).ok).toBe(true);
+    const sent = validateRsvp({ ...base, attendance, accommodation: "both" });
+    expect(sent.ok && sent.value.accommodation).toBe(null);
   });
 
   it.each(["plain", "a@b", "a b@c.cz", "x".repeat(250) + "@a.cz"])("rejects email %s", (email) => {
@@ -37,9 +29,8 @@ describe("validateRsvp", () => {
     expect(!r.ok && r.errors.email).toBeTruthy();
   });
 
-  it("rejects unknown attendance and accommodation values", () => {
+  it("rejects unknown attendance values", () => {
     expect(validateRsvp({ ...base, attendance: "maybe" }).ok).toBe(false);
-    expect(validateRsvp({ ...base, accommodation: "three" }).ok).toBe(false);
   });
 
   it("normalises whitespace and limits name length, rejecting control characters", () => {

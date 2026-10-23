@@ -24,12 +24,6 @@ export const event = {
     address: "",
   },
 
-  /** The two accommodation nights, written as they should read on the form. */
-  nights: {
-    first: "[datum 1. noci]",
-    second: "[datum 2. noci]",
-  },
-
   copy: {
     envelopeHint: "Klepnutím otevři",
     cardOpening: "Budeme se brát!",
@@ -40,19 +34,6 @@ export const event = {
 
 export const coupleNames = `${event.couple.first} & ${event.couple.second}`;
 export const siteName = "Svatba Jordánovi";
-
-export function accommodationLabel(choice: "none" | "first" | "second" | "both"): string {
-  switch (choice) {
-    case "none":
-      return "Bez přespání";
-    case "first":
-      return `První noc — ${event.nights.first}`;
-    case "second":
-      return `Druhá noc — ${event.nights.second}`;
-    case "both":
-      return `Obě noci — ${event.nights.first} a ${event.nights.second}`;
-  }
-}
 
 export function findPlaceholders(value: unknown = event, path = "event"): string[] {
   if (typeof value === "string") return /\[[^\]]+\]/.test(value) ? [`${path}: ${value}`] : [];

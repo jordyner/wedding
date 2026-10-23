@@ -14,7 +14,9 @@ import {
 import type { Db } from "./db";
 import { confirmationEmail, recoveryEmail } from "./emailTemplates";
 import type { Mailer } from "./mailer";
+import type { SavedResponse } from "./sheet";
 import { hit, LIMITS } from "./rateLimit";
+import { relaxAccommodationSql } from "./schema";
 import { createToken, fingerprint, hashToken, isWellFormedToken } from "./tokens";
 
 /**
@@ -28,7 +30,13 @@ import { createToken, fingerprint, hashToken, isWellFormedToken } from "./tokens
  * - A different name with the same email is a different guest (shared inboxes are fine).
  * - A browser retry carries the same submissionId and resolves to the original record.
  */
-export type Deps = { db: Db; mailer: Mailer; siteUrl: string };
+export type Deps = { db: Db; mailer: Mailer; siteUrl: string; onSaved?: OnSaved };
+/** Called once an answer is stored (new, replaced or edited), e.g. to mirror it to a sheet. */
+export type OnSaved = (r: SavedResponse) => void;
+
+function saved(r: ResponseRow & { id: string }): SavedResponse {
+  return { id: r.id, fullName: r.full_name, email: r.email, attendance: r.attendance, updatedAt: r.updated_at };
+}
 
 type ResponseRow = {
   id: string;
@@ -43,6 +51,20 @@ type ResponseRow = {
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const UNIQUE_VIOLATION = "23505";
+
+// Brings an older production database up to the current accommodation rule without a
+// manual migration. Once per instance; a failure is retried on the next request.
+let schemaReady: Promise<void> | null = null;
+function ensureSchema(db: Db): Promise<void> {
+  schemaReady ??= db.query(relaxAccommodationSql).then(
+    () => undefined,
+    (err) => {
+      schemaReady = null;
+      console.error(`schema check failed: ${(err as { code?: string }).code ?? (err as Error).name}`);
+    },
+  );
+  return schemaReady;
+}
 
 export function editUrl(siteUrl: string, token: string) {
   return `${siteUrl.replace(/\/$/, "")}/odpoved/${token}`;
@@ -62,6 +84,7 @@ export async function submitRsvp(
   const validated = validateRsvp(body);
   if (!validated.ok) return { status: "invalid", errors: validated.errors };
   const input = validated.value;
+  await ensureSchema(db);
 
   // A retry of a request we already stored: never insert twice.
   const previous = await findBySubmission(db, submissionId);
@@ -89,7 +112,10 @@ export async function submitRsvp(
     ],
   );
 
-  if (rows[0]) return { status: "saved", email: await sendLinkEmail(deps, rows[0], "confirmation") };
+  if (rows[0]) {
+    deps.onSaved?.(saved(rows[0]));
+    return { status: "saved", email: await sendLinkEmail(deps, rows[0], "confirmation") };
+  }
 
   // Lost a race with our own retry?
   const raced = await findBySubmission(db, submissionId);
@@ -105,6 +131,7 @@ export async function submitRsvp(
     [emailKey(input.email), nameKey(input.fullName), input.fullName, input.attendance, input.accommodation],
   );
   if (!updated.rows[0]) throw new Error("insert conflict without a matching row");
+  deps.onSaved?.(saved(updated.rows[0]));
   return { status: "saved", email: await sendLinkEmail(deps, updated.rows[0], "confirmation") };
 }
 
@@ -221,13 +248,18 @@ export async function getByToken(db: Db, token: string): Promise<EditableRespons
   };
 }
 
-export async function updateByToken(db: Db, body: Record<string, unknown>): Promise<EditResponse> {
+export async function updateByToken(
+  db: Db,
+  body: Record<string, unknown>,
+  onSaved?: OnSaved,
+): Promise<EditResponse> {
   const token = body.token;
   if (!isWellFormedToken(token)) return { status: "invalid_token" };
 
   const validated = validateRsvp(body, { requireEmail: false });
   if (!validated.ok) return { status: "invalid", errors: validated.errors };
   const input = validated.value;
+  await ensureSchema(db);
 
   const hash = hashToken(token);
   if (!(await hit(db, `edit:${hash.slice(0, 32)}`, LIMITS.editsPerToken.limit, LIMITS.editsPerToken.window))) {
@@ -235,15 +267,16 @@ export async function updateByToken(db: Db, body: Record<string, unknown>): Prom
   }
 
   try {
-    const { rows } = await db.query<{ updated_at: Date | string }>(
+    const { rows } = await db.query<ResponseRow>(
       `update rsvp_responses r
           set full_name = $2, name_key = $3, attendance = $4, accommodation = $5, updated_at = now()
          from rsvp_edit_tokens t
         where t.token_hash = $1 and t.revoked_at is null and r.id = t.response_id
-        returning r.updated_at`,
+        returning r.*`,
       [hash, input.fullName, nameKey(input.fullName), input.attendance, input.accommodation],
     );
     if (!rows[0]) return { status: "invalid_token" };
+    onSaved?.(saved(rows[0]));
     return { status: "updated", updatedAt: new Date(rows[0].updated_at).toISOString() };
   } catch (err) {
     // Renamed to match another guest who shares this inbox.

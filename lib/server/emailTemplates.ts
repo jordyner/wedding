@@ -1,16 +1,10 @@
-import { accommodationLabel, coupleNames, siteName } from "@/content/event";
+import { coupleNames, siteName } from "@/content/event";
 import { attendanceLabel, type Accommodation, type Attendance } from "@/lib/rsvp";
 
 type Summary = { fullName: string; attendance: Attendance; accommodation: Accommodation | null };
 
 const escapeHtml = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-
-function accommodationLine(r: Summary): string {
-  if (r.attendance === "yes" && r.accommodation) return accommodationLabel(r.accommodation);
-  if (r.attendance === "undecided") return "Rozhodneš se později";
-  return "—";
-}
 
 const colors = { page: "#f1eadf", paper: "#fdfaf3", ink: "#36302a", soft: "#625646", accent: "#7a5d35", rule: "#e3d5bb" };
 
@@ -44,7 +38,6 @@ export function confirmationEmail(r: Summary, editUrl: string) {
   const rows = [
     ["Jméno", r.fullName],
     ["Dorazíš?", attendanceLabel[r.attendance]],
-    ["Ubytování", accommodationLine(r)],
   ];
   const html = layout(
     `<p style="margin:0 0 16px;">Ahoj,</p>
@@ -70,7 +63,6 @@ díky, že dáváš vědět! Tvoji předběžnou odpověď máme uloženou:
 
 Jméno: ${r.fullName}
 Dorazíš? ${attendanceLabel[r.attendance]}
-Ubytování: ${accommodationLine(r)}
 
 Kdyby se něco změnilo, odpověď můžeš kdykoli upravit tady:
 ${editUrl}

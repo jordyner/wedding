@@ -1,8 +1,9 @@
 import "server-only";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { getDb, StorageUnavailableError } from "./db";
 import { getMailer } from "./mailer";
-import type { Deps } from "./rsvpService";
+import type { Deps, OnSaved } from "./rsvpService";
+import { pushToSheet, sheetConfigured } from "./sheet";
 
 const MAX_BODY_BYTES = 4_096;
 
@@ -19,7 +20,13 @@ export function siteUrl(): string {
 }
 
 export function deps(): Deps {
-  return { db: getDb(), mailer: getMailer(), siteUrl: siteUrl() };
+  return { db: getDb(), mailer: getMailer(), siteUrl: siteUrl(), onSaved: sheetHook() };
+}
+
+/** Mirrors saved answers to the Google Sheet after the response is sent (see lib/server/sheet.ts). */
+export function sheetHook(): OnSaved | undefined {
+  if (!sheetConfigured()) return undefined;
+  return (r) => after(() => pushToSheet(r));
 }
 
 /** Network identity for rate limiting. Vercel sets x-forwarded-for; the value is hashed before storage. */

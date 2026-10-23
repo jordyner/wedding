@@ -2,9 +2,7 @@
 
 import { useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
-import { accommodationLabel } from "@/content/event";
 import {
-  ACCOMMODATION,
   ATTENDANCE,
   attendanceLabel,
   validateRsvp,
@@ -52,7 +50,6 @@ export function RsvpForm({ mode, titleId }: { mode: Mode; titleId?: string }) {
     email: `${formId}-email`,
     emailHelp: `${formId}-email-help`,
     attendance: `${formId}-attendance`,
-    accommodation: `${formId}-accommodation`,
     err: (f: string) => `${formId}-${f}-error`,
   };
 
@@ -66,7 +63,6 @@ export function RsvpForm({ mode, titleId }: { mode: Mode; titleId?: string }) {
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState<{ tone: "error" | "success"; text: ReactNode } | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
-  const [accommodationAnimated, setAccommodationAnimated] = useState(false);
 
   // One id per filled-in form: a retried or double-sent request resolves to the same record.
   const submissionId = useRef<string | null>(null);
@@ -79,11 +75,8 @@ export function RsvpForm({ mode, titleId }: { mode: Mode; titleId?: string }) {
 
   function update<K extends keyof Values>(key: K, value: Values[K]) {
     const next = { ...values, [key]: value };
-    // Leaving "yes" drops the night selection so a stale choice is never sent.
-    if (key === "attendance" && value !== "yes") next.accommodation = null;
     setValues(next);
     if (submitted) setErrors(clientErrors(next));
-    if (key === "attendance" && value === "yes") setAccommodationAnimated(true);
     if (status?.tone === "success") setStatus(null);
   }
 
@@ -95,7 +88,7 @@ export function RsvpForm({ mode, titleId }: { mode: Mode; titleId?: string }) {
   function focusFirstError(errs: FieldErrors) {
     const form = formRef.current;
     if (!form) return;
-    const order: (keyof FieldErrors)[] = ["fullName", "email", "attendance", "accommodation"];
+    const order: (keyof FieldErrors)[] = ["fullName", "email", "attendance"];
     const first = order.find((k) => errs[k]);
     if (!first) return;
     const target =
@@ -318,33 +311,6 @@ export function RsvpForm({ mode, titleId }: { mode: Mode; titleId?: string }) {
         ))}
         <FieldError id={ids.err("attendance")} message={errors.attendance} />
       </fieldset>
-
-      {values.attendance === "yes" ? (
-        <fieldset
-          className={`choices accommodation${accommodationAnimated ? " is-entering" : ""}`}
-          aria-invalid={errors.accommodation ? true : undefined}
-          data-testid="accommodation"
-        >
-          <legend>Přespíš u nás?</legend>
-          <div className="choice-list">
-          {ACCOMMODATION.map((option) => (
-            <label className="choice" key={option}>
-              <input
-                type="radio"
-                name="accommodation"
-                value={option}
-                required
-                checked={values.accommodation === option}
-                onChange={() => update("accommodation", option)}
-                aria-describedby={describedBy(errors.accommodation && ids.err("accommodation"))}
-              />
-              <span className="choice-text">{accommodationLabel(option)}</span>
-            </label>
-          ))}
-          </div>
-          <FieldError id={ids.err("accommodation")} message={errors.accommodation} />
-        </fieldset>
-      ) : null}
 
       {!isEdit ? (
         <div className="honeypot" aria-hidden="true">
