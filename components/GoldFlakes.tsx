@@ -9,6 +9,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
  */
 const COUNT = 28;
 const LIFETIME_MS = 6500;
+const MOUNT_DELAY_MS = 900;
 
 // Irregular torn-foil outlines, picked at random per flake.
 const SHAPES = [
@@ -44,9 +45,14 @@ export function GoldFlakes() {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setFlakes(makeFlakes());
-    const t = window.setTimeout(() => setFlakes(null), LIFETIME_MS + 1500);
-    return () => clearTimeout(t);
+    // Created a little later, not in the busy frame where the card takes over from the
+    // envelope; the CSS delay is shorter by the same amount, so they still fall on cue.
+    const show = window.setTimeout(() => setFlakes(makeFlakes()), MOUNT_DELAY_MS);
+    const hide = window.setTimeout(() => setFlakes(null), MOUNT_DELAY_MS + LIFETIME_MS + 1500);
+    return () => {
+      clearTimeout(show);
+      clearTimeout(hide);
+    };
   }, []);
 
   if (!flakes) return null;

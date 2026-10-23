@@ -110,77 +110,82 @@ export function InvitationExperience({
     const final = cardEl.getBoundingClientRect();
     const s = handoff.mini.width / final.width;
     const from = `translate(${handoff.mini.left - final.left}px, ${handoff.mini.top - final.top}px) scale(${s})`;
-    // Bottom of the card that was still inside the pocket, in card pixels.
-    const hiddenStart = Math.max(
-      0,
-      final.height - (handoff.env.bottom - handoff.mini.top) / s,
-    );
+    // How far the card (at its starting size) still reaches below the envelope's bottom edge.
+    const hidden = Math.max(0, handoff.mini.top + final.height * s - handoff.env.bottom);
     // The envelope travels off-screen and at least far enough to uncover the whole card.
     // (+ the open flap, which stands above the envelope's top edge).
     const distance = Math.max(
       window.innerHeight - handoff.env.top + handoff.env.height * 0.6 + 40,
-      hiddenStart * s + 40,
+      hidden + 40,
     );
-    const setClip = (bottom: number | null) => {
-      const value =
-        bottom === null ? "" : `inset(-80px -80px ${bottom}px -80px)`;
-      cardEl.style.clipPath = value;
-      cardEl.style.setProperty("-webkit-clip-path", value);
+    // The card may only show above the envelope's bottom edge. The clip sits on the card's
+    // wrapper and never changes: the wrapper travels down with the envelope while the card
+    // travels back up by the same amount, so the edge uncovers it and every frame is a
+    // compositor-only transform (no per-frame clip, style or paint work on the main thread).
+    const clipBox = cardEl.parentElement as HTMLElement;
+    const clip = `inset(-100vh -80px ${final.bottom - handoff.env.bottom}px -80px)`;
+    const setClip = (value: string) => {
+      clipBox.style.clipPath = value;
+      clipBox.style.setProperty("-webkit-clip-path", value);
     };
 
-    // Stage 1 (frame-driven so the clip works in every engine): the envelope is drawn
-    // away downward and the card is uncovered exactly as fast as the pocket leaves it.
-    let frame = 0;
     let cancelled = false;
     let settle: Animation | null = null;
     // No CSS transition may interpolate these jumps (the tilt has one on transform).
     cardEl.style.transition = "none";
     cardEl.style.transformOrigin = "0 0";
     cardEl.style.transform = from;
-    setClip(hiddenStart);
-    const start = performance.now();
-    const step = (now: number) => {
-      if (cancelled) return;
-      const t = Math.min(1, (now - start) / SLIDE_MS);
-      const travelled = distance * t * t * t; // ease-in: the envelope gathers speed
-      back.style.transform =
-        front.style.transform = `translateY(${travelled}px)`;
-      setClip(Math.max(0, hiddenStart - travelled / s));
-      if (t < 1) {
-        frame = requestAnimationFrame(step);
-        return;
-      }
-      // Stage 2: the card comes forward to its place (compositor-only transform).
-      back.style.visibility = front.style.visibility = "hidden";
-      setClip(null);
-      cardEl.style.transform = "";
-      cardEl.style.transformOrigin = "";
-      settle = cardEl.animate(
+    setClip(clip);
+
+    // Stage 1: the envelope is drawn away downward, gathering speed (ease-in cubic).
+    const slide = { duration: SLIDE_MS, easing: "cubic-bezier(0.32, 0, 0.67, 0)", fill: "forwards" as const };
+    const away = [{ transform: "translateY(0)" }, { transform: `translateY(${distance}px)` }];
+    const stage1 = [
+      back.animate(away, slide),
+      front.animate(away, slide),
+      clipBox.animate(away, slide),
+      cardEl.animate(
         [
-          { transformOrigin: "0 0", transform: from },
-          { transformOrigin: "0 0", transform: "none" },
+          { transform: `translateY(0) ${from}` },
+          { transform: `translateY(${-distance}px) ${from}` },
         ],
-        { duration: SETTLE_MS, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
-      );
-      settle.finished
-        .then(() => {
-          if (cancelled) return;
-          cardEl.style.transition = "";
-          setHandoff(null);
-          // Don't pull focus back if the guest has already moved on (e.g. into the reply form).
-          const active = document.activeElement;
-          if (!active || active === document.body)
-            cardEl.focus({ preventScroll: true });
-        })
-        .catch(() => {});
-    };
-    frame = requestAnimationFrame(step);
+        slide,
+      ),
+    ];
+    stage1[0].finished
+      .then(() => {
+        if (cancelled) return;
+        // Stage 2: the card comes forward to its place (compositor-only transform).
+        back.style.visibility = front.style.visibility = "hidden";
+        setClip("");
+        stage1.forEach((a) => a.cancel());
+        cardEl.style.transform = "";
+        cardEl.style.transformOrigin = "";
+        settle = cardEl.animate(
+          [
+            { transformOrigin: "0 0", transform: from },
+            { transformOrigin: "0 0", transform: "none" },
+          ],
+          { duration: SETTLE_MS, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+        );
+        return settle.finished;
+      })
+      .then(() => {
+        if (cancelled) return;
+        cardEl.style.transition = "";
+        setHandoff(null);
+        // Don't pull focus back if the guest has already moved on (e.g. into the reply form).
+        const active = document.activeElement;
+        if (!active || active === document.body)
+          cardEl.focus({ preventScroll: true });
+      })
+      .catch(() => {});
 
     return () => {
       cancelled = true;
-      cancelAnimationFrame(frame);
+      stage1.forEach((a) => a.cancel());
       settle?.cancel();
-      setClip(null);
+      setClip("");
       cardEl.style.transform = "";
       cardEl.style.transformOrigin = "";
       cardEl.style.transition = "";

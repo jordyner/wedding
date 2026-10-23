@@ -667,7 +667,7 @@ a:hover {
   position: absolute;
   top: -5vh;
   opacity: 0;
-  animation: flake-fall var(--fall) cubic-bezier(0.3, 0.1, 0.5, 1) calc(1100ms + var(--delay)) forwards;
+  animation: flake-fall var(--fall) cubic-bezier(0.3, 0.1, 0.5, 1) calc(200ms + var(--delay)) forwards;
   will-change: transform, opacity;
 }
 .gold-flake-leaf {
