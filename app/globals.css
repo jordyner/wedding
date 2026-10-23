@@ -1364,6 +1364,13 @@ a:hover {
   animation: leaves-sway 13s ease-in-out infinite alternate;
   will-change: transform;
 }
+/* Phones: Safari paints the status bar area itself, so shadows reaching up there end in
+   a hard line. Start them just below it; their blur then fades out on the page. */
+@media (hover: none) {
+  .table-light svg {
+    top: calc(env(safe-area-inset-top, 0px) + 1.25rem);
+  }
+}
 @keyframes leaves-sway {
   from {
     transform: rotate(-3deg);
