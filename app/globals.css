@@ -65,9 +65,9 @@ body {
   overscroll-behavior: none;
   min-height: 100svh;
   color: var(--ink);
-  background:
-    radial-gradient(120% 70% at 50% 0%, var(--table-light) 0%, transparent 70%),
-    var(--table);
+  /* the top colour is also the body's background-color, which Safari uses for
+     the status bar, so there's no band above the page */
+  background: linear-gradient(180deg, var(--table-light) 0, var(--table) 70svh) var(--table-light);
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
   font-size: 1.125rem;
   line-height: 1.6;
@@ -155,7 +155,7 @@ a:hover {
 /* The open card and its reply button take one screen; in a taller window they sit
    centred instead of hugging the top. */
 .first-screen {
-  min-height: calc(100svh - var(--pad-top) - 1.25rem - env(safe-area-inset-bottom, 0px));
+  min-height: calc(100svh - var(--pad-top) - var(--pad-bottom));
   display: grid;
   align-content: center;
 }
@@ -584,31 +584,6 @@ a:hover {
     background-position: 0% 0%, 0 0;
   }
 }
-/* On a phone held upright the card and the reply button fill exactly one screen:
-   the card stretches to the bottom, its lines spread evenly, the button sits
-   at the bottom edge. Applies to the miniature in the envelope too, so the
-   hand-off between them stays seamless. */
-@media (max-width: 40rem) and (orientation: portrait) {
-  /* the card fills the screen; the reply button floats over its lower edge */
-  .invitation {
-    min-height: calc(100svh - var(--sheet-top) - 1rem - env(safe-area-inset-bottom, 0px));
-    padding-bottom: 5.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-  }
-  .sheet .respond {
-    margin-top: calc(-2.5rem - 2.75rem);
-    margin-bottom: 2.75rem;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 2.75rem);
-  }
-  .sheet .respond .btn {
-    min-height: 2.5rem;
-    padding: 0.25rem 1.15rem;
-    font-size: 0.875rem;
-    background: rgb(253 250 243 / 0.7);
-  }
-}
 .invitation:focus {
   outline: none;
 }
@@ -675,6 +650,54 @@ a:hover {
   -webkit-text-fill-color: transparent;
   animation: amp-glint 7s ease-in-out 1.9s infinite;
 }
+/* Gold leaf drifting down once as the card opens (components/GoldFlakes.tsx) */
+.gold-flakes {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+}
+.gold-flake {
+  position: absolute;
+  top: -5vh;
+  opacity: 0;
+  animation: flake-fall var(--fall) cubic-bezier(0.3, 0.1, 0.5, 1) calc(1100ms + var(--delay)) forwards;
+  will-change: transform, opacity;
+}
+.gold-flake-leaf {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #a9813f, #f1dca4 45%, #c49a55 60%, #e8cf8e);
+  animation: flake-turn var(--spin) ease-in-out infinite alternate;
+  transform: rotate(var(--tilt));
+}
+@keyframes flake-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  12% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), 108vh, 0);
+  }
+}
+@keyframes flake-turn {
+  from {
+    transform: rotate(var(--tilt)) rotateX(10deg) scaleY(1);
+  }
+  to {
+    transform: rotate(calc(var(--tilt) + 50deg)) rotateX(70deg) scaleY(0.4);
+  }
+}
+
 /* Phones: keep the gold but not the moving glint, which repaints the whole card. */
 @media (hover: none) {
   .inv-foil,
@@ -771,22 +794,49 @@ a:hover {
 }
 
 .respond {
-  /* stays in view at the bottom of the screen until the guest scrolls to its place */
-  position: sticky;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(1rem, 3vw, 1.5rem));
-  z-index: 2;
+  /* a small control floating at the bottom of the screen, apart from the card;
+     it steps aside once the reply card is on screen */
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+  z-index: 10;
   display: grid;
   justify-items: center;
-  margin-top: clamp(1.5rem, 5vw, 2.25rem);
+  pointer-events: none;
+  transition:
+    opacity 300ms ease,
+    translate 300ms var(--ease-out);
+}
+/* on a computer it sits a little higher than on a phone */
+@media (hover: hover) and (pointer: fine) {
+  .respond {
+    bottom: 5rem;
+  }
+}
+.respond .btn {
+  pointer-events: auto;
+}
+.respond.is-away {
+  opacity: 0;
+  translate: 0 0.75rem;
+}
+.respond.is-away .btn {
+  pointer-events: none;
+}
+/* room below the card so the floating button never covers its last line */
+.page:has(.sheet) {
+  --pad-bottom: 5.5rem;
 }
 /* Minimal: a small frosted pill with a hairline, readable over the card but never
    louder than it. Still a 44px tap target. */
 .respond .btn {
   min-height: 2.75rem;
-  padding: 0.35rem 1.35rem;
-  border-color: rgb(122 93 53 / 0.32);
-  background: rgb(253 250 243 / 0.7);
-  font-size: 0.95rem;
+  padding: 0.3rem 1.25rem;
+  border-color: rgb(122 93 53 / 0.25);
+  background: rgb(247 242 233 / 0.72);
+  box-shadow: 0 4px 14px -8px rgb(74 58 38 / 0.25);
+  font-size: 0.875rem;
   font-variant-caps: all-small-caps;
   letter-spacing: 0.12em;
 }
@@ -795,7 +845,7 @@ a:hover {
   background: rgb(253 250 243 / 0.7);
 }
 .respond.is-entering {
-  animation: rise-in 500ms var(--ease-out) 300ms both;
+  animation: rise-in 500ms var(--ease-out) 300ms backwards;
 }
 @keyframes fade-in {
   from {

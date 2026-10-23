@@ -15,6 +15,7 @@ import {
   EnvelopeFlap,
   EnvelopePocket,
 } from "./Envelope";
+import { GoldFlakes } from "./GoldFlakes";
 import { RsvpForm } from "./RsvpForm";
 import { WaxSealDefs } from "./WaxSeal";
 
@@ -196,6 +197,16 @@ export function InvitationExperience({
     if (replyOpen) goToReply();
   }, [replyOpen]);
 
+  // The floating button steps aside while the reply card is on screen.
+  const [replyInView, setReplyInView] = useState(false);
+  useEffect(() => {
+    const el = replyRef.current;
+    if (!replyOpen || !el) return;
+    const io = new IntersectionObserver(([entry]) => setReplyInView(entry.isIntersecting), { threshold: 0.05 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [replyOpen]);
+
   const ghostStyle = handoff
     ? {
         left: handoff.env.left,
@@ -224,6 +235,7 @@ export function InvitationExperience({
         </div>
       ) : (
         <div className="sheet" data-phase="open">
+          {animate ? <GoldFlakes /> : null}
           {handoff ? (
             <div
               className="envelope-ghost is-back"
@@ -262,7 +274,7 @@ export function InvitationExperience({
             ) : null}
 
             {/* Always visible; once the reply card is open it takes the guest back to it. */}
-            <div className={`respond${animate ? " is-entering" : ""}`}>
+            <div className={`respond${animate ? " is-entering" : ""}${replyInView ? " is-away" : ""}`}>
               <button
                 type="button"
                 className="btn"
