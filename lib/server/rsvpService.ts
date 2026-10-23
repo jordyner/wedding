@@ -179,6 +179,7 @@ export async function sendLinkEmail(
     LIMITS.emailsPerInbox.window,
   );
   if (!inboxOk) {
+    console.error("[rsvp] email failed: rate_limited");
     await markEmail(db, current.id, failedStatus, "rate_limited", null);
     return "failed";
   }
@@ -208,6 +209,8 @@ export async function sendLinkEmail(
   if (result.error !== "timeout" && result.error !== "network") {
     await db.query(`delete from rsvp_edit_tokens where token_hash = $1`, [hash]);
   }
+  // The failure class only, never the address or the token.
+  console.error(`[rsvp] email failed: ${result.error}`);
   await markEmail(db, current.id, failedStatus, result.error, null);
   return "failed";
 }

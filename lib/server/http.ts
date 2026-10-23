@@ -25,7 +25,10 @@ export function deps(): Deps {
 
 /** Mirrors saved answers to the Google Sheet after the response is sent (see lib/server/sheet.ts). */
 export function sheetHook(): OnSaved | undefined {
-  if (!sheetConfigured()) return undefined;
+  if (!sheetConfigured()) {
+    console.warn("[sheet] not configured: GOOGLE_SHEET_WEBHOOK_URL or GOOGLE_SHEET_SECRET is missing");
+    return undefined;
+  }
   return (r) => after(() => pushToSheet(r));
 }
 

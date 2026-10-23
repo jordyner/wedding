@@ -39,9 +39,9 @@ export async function pushToSheet(r: SavedResponse): Promise<void> {
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     const body = (await res.json().catch(() => null)) as { ok?: boolean } | null;
-    if (!res.ok || !body?.ok) console.error(`sheet sync failed: HTTP ${res.status}${body ? " (rejected)" : ""}`);
+    if (!res.ok || !body?.ok) console.error(`[sheet] sync failed: HTTP ${res.status}${body ? " (rejected: check the secret)" : " (not the script's reply: check the URL ends in /exec)"}`);
   } catch (err) {
     // No guest data in the log, only what went wrong.
-    console.error(`sheet sync failed: ${(err as Error).name}`);
+    console.error(`[sheet] sync failed: ${(err as Error).name}`);
   }
 }
