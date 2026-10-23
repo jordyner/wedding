@@ -550,14 +550,66 @@ a:hover {
   padding: clamp(3.25rem, 11vw, 5rem) clamp(1.75rem, 8vw, 4rem) clamp(3rem, 10vw, 4.5rem);
   text-align: center;
 }
-.invitation::after {
-  /* double hairline frame */
-  content: "";
+/* Gold foil: the double frame is two hairlines cut out of a champagne-gold wash,
+   and a soft glint of light sweeps across them now and then, like turning a
+   foil-stamped card in the hand. */
+.invitation {
+  --foil: linear-gradient(135deg, #b38f57 0%, #e0c690 28%, #b9935a 52%, #e6d0a0 76%, #ad8650 100%);
+  --glint: linear-gradient(120deg, transparent 44%, rgb(255 249 232 / 0.95) 50%, transparent 56%);
+  --frame-inset: clamp(0.625rem, 2.4vw, 0.875rem);
+}
+/* Paper feel on the light ivory card: a fine cotton grain, light falling softly
+   from the top left, a faint warm falloff to the far corner and a bright cut edge. */
+.paper-sheet {
   position: absolute;
-  inset: clamp(0.625rem, 2.4vw, 0.875rem);
-  border: 1px solid var(--blush-line);
-  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px rgb(214 194 158 / 0.55);
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(130% 80% at 15% 0%, rgb(255 255 255 / 0.6), transparent 60%),
+    radial-gradient(90% 70% at 100% 100%, rgb(170 140 100 / 0.06), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .3 0 0 0 .5 -.15'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E") 0 0 / 200px 200px;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.7),
+    inset 0 -1px 0 1px rgb(190 165 125 / 0.12);
+  border-radius: inherit;
   pointer-events: none;
+}
+.invitation::before {
+  display: none;
+}
+
+/* Ink on paper */
+.invitation .name {
+  filter: url(#ink);
+}
+.invitation :is(.inv-opening, .inv-invite, .inv-detail) {
+  filter: url(#ink-fine);
+}
+
+.inv-foil {
+  position: absolute;
+  inset: var(--frame-inset);
+  z-index: 1;
+  border: 1px solid transparent;
+  background: var(--glint) 0 0 / 300% 300% border-box, var(--foil) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) padding-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+  animation: foil-glint 7s ease-in-out 1.2s infinite;
+}
+.inv-foil-inner {
+  inset: calc(var(--frame-inset) + 5px);
+  opacity: 0.75;
+}
+@keyframes foil-glint {
+  0% {
+    background-position: 100% 100%, 0 0;
+  }
+  45%,
+  100% {
+    background-position: 0% 0%, 0 0;
+  }
 }
 /* On a phone held upright the card and the reply button fill exactly one screen:
    the card stretches to the bottom, its lines spread evenly, the button sits
@@ -585,50 +637,7 @@ a:hover {
   z-index: 2;
   perspective: 1600px;
 }
-.card-tilt .invitation {
-  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform 700ms var(--ease-out);
-}
-.card-tilt[data-tilting] .invitation {
-  transition-duration: 160ms;
-}
-.sheen {
-  /* light sliding over the paper as the card tilts */
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  border-radius: inherit;
-  background: radial-gradient(55% 40% at var(--gx, 50%) var(--gy, 0%), rgb(255 255 255 / 0.5), transparent 70%);
-  opacity: 0;
-  transition: opacity 500ms ease;
-}
-.card-tilt[data-tilting] .sheen {
-  opacity: 1;
-}
-
 /* As the card comes forward, the lower half settles in. */
-.is-revealing .ornament .draw {
-  animation: draw-line 650ms var(--ease-out) 480ms both;
-}
-.is-revealing .ornament circle {
-  animation: fade-in 300ms ease 850ms both;
-}
-.is-revealing .inv-detail {
-  animation: rise-in 600ms var(--ease-out) both;
-}
-.is-revealing .inv-date {
-  animation-delay: 580ms;
-}
-.is-revealing .inv-time {
-  animation-delay: 650ms;
-}
-.is-revealing .inv-venue {
-  animation-delay: 720ms;
-}
-.is-revealing .inv-address {
-  animation-delay: 790ms;
-}
 
 .ornament .draw {
   stroke-dasharray: 1;
@@ -671,13 +680,29 @@ a:hover {
   text-wrap: balance;
 }
 .inv-names .amp {
-  /* "a" in the same hand as the names, smaller and in the accent colour */
+  /* "a" in the same hand as the names, in gold foil that catches the same glint */
   display: block;
-  margin: 0.02em 0 0.06em;
+  width: fit-content;
+  margin: 0.02em auto 0.06em;
+  padding: 0 0.15em;
   font-family: var(--font-script), cursive;
   font-size: 0.6em;
   line-height: 1;
   color: var(--accent);
+  background: linear-gradient(120deg, #9c7845 0%, #9c7845 40%, #f3e2bb 50%, #9c7845 60%, #9c7845 100%) 0 0 / 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: amp-glint 7s ease-in-out 1.9s infinite;
+}
+@keyframes amp-glint {
+  0% {
+    background-position: 100% 0;
+  }
+  45%,
+  100% {
+    background-position: 0% 0;
+  }
 }
 .inv-names .name {
   display: block;

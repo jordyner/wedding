@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "app/globals.css"
+        ],
+        "createdAt": "2026-10-23T17:26:03.490Z",
+        "reason": "Gold-foil 'a' on the invitation: a single decorative glyph imitating foil stamping, chosen by the user"
+      }
+    ]
+  }
+}

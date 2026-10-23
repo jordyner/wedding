@@ -17,7 +17,6 @@ import {
 } from "./Envelope";
 import { RsvpForm } from "./RsvpForm";
 import { WaxSealDefs } from "./WaxSeal";
-import { useTilt } from "./useTilt";
 
 type Phase = "closed" | "opening" | "open";
 type Handoff = { env: DOMRect; mini: DOMRect };
@@ -49,7 +48,6 @@ export function InvitationExperience({
   const [phase, setPhase] = useState<Phase>("closed");
   const [animate, setAnimate] = useState(true);
   const [handoff, setHandoff] = useState<Handoff | null>(null);
-  const [settled, setSettled] = useState(false);
   const [replyOpen, setReplyOpen] = useState(false);
 
   const envelopeRef = useRef<HTMLButtonElement>(null);
@@ -57,7 +55,6 @@ export function InvitationExperience({
   const ghostBackRef = useRef<HTMLDivElement>(null);
   const ghostFrontRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLElement>(null);
-  const tiltRef = useTilt<HTMLDivElement>(3, settled);
   const replyTitleRef = useRef<HTMLHeadingElement>(null);
   const replyRef = useRef<HTMLElement>(null);
   const timers = useRef<number[]>([]);
@@ -69,7 +66,6 @@ export function InvitationExperience({
     navigator.vibrate?.(12);
     if (prefersReducedMotion()) {
       setAnimate(false);
-      setSettled(true);
       setPhase("open");
       return;
     }
@@ -93,7 +89,6 @@ export function InvitationExperience({
     const back = ghostBackRef.current;
     const front = ghostFrontRef.current;
     if (!handoff || !cardEl || !back || !front) {
-      setSettled(true);
       cardEl?.focus({ preventScroll: true });
       return;
     }
@@ -158,7 +153,6 @@ export function InvitationExperience({
           if (cancelled) return;
           cardEl.style.transition = "";
           setHandoff(null);
-          setSettled(true);
           // Don't pull focus back if the guest has already moved on (e.g. into the reply form).
           const active = document.activeElement;
           if (!active || active === document.body)
@@ -244,16 +238,15 @@ export function InvitationExperience({
 
           {/* card + reply button: one screen, centred vertically when the window is taller */}
           <div className="first-screen">
-            <div className="card-tilt" ref={tiltRef}>
+            <div className="card-tilt">
               <article
                 ref={cardRef}
-                className={`paper invitation${animate ? " is-revealing" : ""}`}
+                className="paper invitation"
                 aria-labelledby="invitation-title"
                 tabIndex={-1}
                 data-testid="invitation"
               >
                 {card}
-                <span className="sheen" aria-hidden="true" />
               </article>
             </div>
 

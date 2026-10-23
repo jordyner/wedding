@@ -1,10 +1,5 @@
 import { event } from "@/content/event";
 
-/**
- * The paper invitation. Real HTML text, all facts from content/event.ts.
- * `decorative` renders the same face with inline elements only, for the copy of the
- * card that sits inside the envelope (inside a <button>, hidden from assistive tech).
- */
 export function InvitationCard({ decorative = false }: { decorative?: boolean }) {
   const P = decorative ? "span" : "p";
   const H1 = decorative ? "span" : "h1";
@@ -14,6 +9,9 @@ export function InvitationCard({ decorative = false }: { decorative?: boolean })
 
   return (
     <>
+      <span className="paper-sheet" aria-hidden="true" />
+      <span className="inv-foil" aria-hidden="true" />
+      <span className="inv-foil inv-foil-inner" aria-hidden="true" />
       <P className="inv-opening">{event.copy.cardOpening}</P>
 
       <H1 className="inv-names" id={decorative ? undefined : "invitation-title"}>
@@ -25,18 +23,18 @@ export function InvitationCard({ decorative = false }: { decorative?: boolean })
       <P className="inv-invite">{event.copy.cardInvitation}</P>
 
       <svg className="ornament" viewBox="0 0 144 16" aria-hidden="true">
-        <path className="draw draw-l" d="M58 8 H0" stroke="currentColor" strokeWidth="1" pathLength={1} />
-        <path className="draw draw-r" d="M86 8 H144" stroke="currentColor" strokeWidth="1" pathLength={1} />
+        <path className="draw draw-l" d="M58 8 H0" stroke="url(#foil-gold)" strokeWidth="1" pathLength={1} />
+        <path className="draw draw-r" d="M86 8 H144" stroke="url(#foil-gold)" strokeWidth="1" pathLength={1} />
         <path
           className="draw"
           d="M72 2.5 L77.5 8 L72 13.5 L66.5 8 Z"
           fill="none"
-          stroke="currentColor"
+          stroke="url(#foil-gold)"
           strokeWidth="1"
           pathLength={1}
         />
-        <circle cx="62" cy="8" r="1.2" fill="currentColor" />
-        <circle cx="82" cy="8" r="1.2" fill="currentColor" />
+        <circle cx="62" cy="8" r="1.2" fill="url(#foil-gold)" />
+        <circle cx="82" cy="8" r="1.2" fill="url(#foil-gold)" />
       </svg>
 
       <Dl className="inv-details">
