@@ -275,11 +275,12 @@ a:hover {
 }
 
 .env-card-window {
-  /* reaches far above the envelope, ends exactly at its bottom edge */
+  /* reaches far above the envelope, ends just inside its bottom edge so the card
+     never peeks out under the pocket's antialiased edge */
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 3px;
   height: 300%;
   z-index: 1;
   overflow: hidden;
@@ -716,26 +717,51 @@ a:hover {
   top: 0;
   translate: -50% -50%;
   opacity: 0;
-  animation: burst-pop var(--fall) cubic-bezier(0.2, 0.7, 0.4, 1) forwards;
+  /* sideways: a quick push that eases out, like air slowing the leaf */
+  animation:
+    burst-drift var(--fall) cubic-bezier(0.15, 0.6, 0.3, 1) forwards,
+    burst-fade var(--fall) linear forwards;
   will-change: transform, opacity;
 }
-@keyframes burst-pop {
+.gold-burst-arc {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* up and down: rises fast, hangs for a moment, then sinks gently */
+  animation: burst-arc var(--fall) linear forwards;
+  will-change: transform;
+}
+@keyframes burst-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(var(--pop-x) * 1.5), 0, 0);
+  }
+}
+@keyframes burst-arc {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.5);
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
+  }
+  22% {
+    transform: translate3d(0, var(--pop-y), 0) scale(1);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.7, 0.9);
+  }
+  100% {
+    transform: translate3d(0, calc(var(--pop-y) + var(--sink)), 0) scale(0.85);
+  }
+}
+@keyframes burst-fade {
   0% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) scale(0.4);
   }
-  12% {
+  8%,
+  60% {
     opacity: 1;
-  }
-  30% {
-    transform: translate3d(var(--pop-x), var(--pop-y), 0) scale(1);
-  }
-  75% {
-    opacity: 0.9;
   }
   100% {
     opacity: 0;
-    transform: translate3d(calc(var(--pop-x) * 1.3), calc(var(--pop-y) + var(--sink)), 0) scale(0.9);
   }
 }
 @media (prefers-reduced-motion: reduce) {

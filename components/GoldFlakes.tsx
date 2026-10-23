@@ -62,7 +62,7 @@ export function GoldFlakes() {
 }
 
 const BURST_COUNT = 12;
-const BURST_MS = 1900;
+const BURST_MS = 2100;
 
 /** A pinch of gold leaf where the guest taps the card: pops out, then drifts down. */
 export function GoldBurst({ x, y, onDone }: { x: number; y: number; onDone: () => void }) {
@@ -77,9 +77,9 @@ export function GoldBurst({ x, y, onDone }: { x: number; y: number; onDone: () =
           width: size,
           height: size * (0.7 + Math.random() * 0.5),
           ["--pop-x" as string]: `${Math.cos(angle) * reach}px`,
-          ["--pop-y" as string]: `${Math.sin(angle) * reach * 0.7 - 14}px`,
-          ["--sink" as string]: `${90 + Math.random() * 90}px`,
-          ["--fall" as string]: `${1300 + Math.random() * 500}ms`,
+          ["--pop-y" as string]: `${Math.min(0, Math.sin(angle)) * reach * 0.8 - 16}px`,
+          ["--sink" as string]: `${80 + Math.random() * 70}px`,
+          ["--fall" as string]: `${1500 + Math.random() * 400}ms`,
           ["--spin" as string]: `${500 + Math.random() * 600}ms`,
           ["--tilt" as string]: `${Math.random() * 360}deg`,
         } as CSSProperties,
@@ -101,7 +101,11 @@ export function GoldBurst({ x, y, onDone }: { x: number; y: number; onDone: () =
     <div className="gold-burst" style={{ left: x, top: y }} aria-hidden="true">
       {flakes.map((f, i) => (
         <span key={i} className="gold-burst-flake" style={f.style}>
-          <span className="gold-flake-leaf" style={{ clipPath: f.shape }} />
+          {/* sideways drift and the rise-and-fall run on separate layers, each with its
+              own easing, so every flake follows one smooth arc */}
+          <span className="gold-burst-arc">
+            <span className="gold-flake-leaf" style={{ clipPath: f.shape }} />
+          </span>
         </span>
       ))}
     </div>

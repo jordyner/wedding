@@ -11,20 +11,20 @@ const crackRight = "polygon(53% 0, 100% 0, 100% 100%, 52% 100%, 46% 71%, 55% 47%
 const PULL_TO_OPEN = 56;
 
 // Envelope geometry in a 100 × 66 box (the envelope's own 3:2 aspect ratio, so nothing
-// is stretched). Like a real envelope, the bottom pocket is shallow and the top flap
-// comes down past it, so the folds never meet in one point; the seal sits on the
-// flap's tip.
-const SIDE_L = "M0 0 L50 36 L0 66 Z";
-const SIDE_R = "M100 0 L50 36 L100 66 Z";
-const BOTTOM = "M0 66 L0 64.5 C18 54 36 43 46.5 38.6 Q50 37.3 53.5 38.6 C64 43 82 54 100 64.5 L100 66 Z";
-const BOTTOM_EDGE = "M0 64.5 C18 54 36 43 46.5 38.6 Q50 37.3 53.5 38.6 C64 43 82 54 100 64.5";
+// is stretched), with crisp straight folds. Like a real envelope, the bottom pocket
+// is shallow and the top flap comes down past it, so the folds never meet in one
+// point; the seal sits on the flap's tip.
+const SIDE_L = "M0 0 L50 40 L0 66 Z";
+const SIDE_R = "M100 0 L50 40 L100 66 Z";
+const BOTTOM = "M0 66 L47.7 38.8 Q50 37.5 52.3 38.8 L100 66 Z";
+const BOTTOM_EDGE = "M0 66 L47.7 38.8 Q50 37.5 52.3 38.8 L100 66";
 // Top flap in a 100 × 42 box (64 % of the envelope's height).
-const FLAP = "M0 0 H100 C82 14 64 29 53.4 39.6 Q50 42 46.6 39.6 C36 29 18 14 0 0 Z";
-const FLAP_EDGE = "M0 0 C18 14 36 29 46.6 39.6 Q50 42 53.4 39.6 C64 29 82 14 100 0";
+const FLAP = "M0 0 H100 L52.2 40.3 Q50 42 47.8 40.3 Z";
+const FLAP_EDGE = "M0 0 L47.8 40.3 Q50 42 52.2 40.3 L100 0";
 // Inside of the flap, drawn upside down: the back face is mirrored once by its own
 // rotateX(180deg) and again by the opening, so it ends up base-down, point-up.
-const FLAP_INSIDE = "M0 42 H100 C82 28 64 13 53.4 2.4 Q50 0 46.6 2.4 C36 13 18 28 0 42 Z";
-const LINER = "M5 42 H95 C79 29 62 15 52.6 6.2 Q50 4.4 47.4 6.2 C38 15 21 29 5 42 Z";
+const FLAP_INSIDE = "M0 42 H100 L52.2 1.7 Q50 0 47.8 1.7 Z";
+const LINER = "M5 42 H95 L51.7 5.8 Q50 4.4 48.3 5.8 Z";
 
 const GRAIN =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .2 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E";
@@ -79,6 +79,10 @@ export function EnvelopeDefs() {
         <filter id="env-soft" x="-10%" y="-20%" width="120%" height="140%">
           <feGaussianBlur stdDeviation="0.9" />
         </filter>
+        {/* a crisp contact shadow where one flap lies on another */}
+        <filter id="env-tight" x="-5%" y="-10%" width="110%" height="120%">
+          <feGaussianBlur stdDeviation="0.3" />
+        </filter>
       </defs>
     </svg>
   );
@@ -92,17 +96,23 @@ export function EnvelopePocket() {
   return (
     <span className="env-pocket" aria-hidden="true">
       <svg viewBox="0 0 100 66">
-        <path d={SIDE_L} fill="url(#env-side-l)" />
-        <path d={SIDE_R} fill="url(#env-side-r)" />
-        {/* the bottom flap is glued over the side flaps and casts a soft shadow on them */}
-        <path d={BOTTOM} transform="translate(0 -1.1)" fill="rgb(76 58 36 / 0.22)" filter="url(#env-soft)" />
-        <path d={BOTTOM} fill="url(#env-bottom)" />
-        {[SIDE_L, SIDE_R, BOTTOM].map((d) => (
+        {/* each flap gets its grain and light right after its fill, so the side flaps'
+            texture never lands on top of the bottom flap where they overlap */}
+        {[
+          [SIDE_L, "url(#env-side-l)"],
+          [SIDE_R, "url(#env-side-r)"],
+        ].map(([d, fill]) => (
           <g key={d}>
+            <path d={d} fill={fill} />
             <path d={d} fill="url(#env-grain)" opacity="0.5" />
             <path d={d} fill="url(#env-light)" />
           </g>
         ))}
+        {/* the bottom flap is glued over the side flaps and casts a soft shadow on them */}
+        <path d={BOTTOM} transform="translate(0 -0.3)" fill="rgb(76 58 36 / 0.18)" filter="url(#env-tight)" />
+        <path d={BOTTOM} fill="url(#env-bottom)" />
+        <path d={BOTTOM} fill="url(#env-grain)" opacity="0.5" />
+        <path d={BOTTOM} fill="url(#env-light)" />
         <path d={BOTTOM_EDGE} fill="none" stroke="rgb(255 251 242 / 0.4)" strokeWidth="0.25" />
         {/* paper edge along the envelope's bottom */}
         <path d="M0 65.7 H100" stroke="rgb(255 251 242 / 0.4)" strokeWidth="0.4" />
