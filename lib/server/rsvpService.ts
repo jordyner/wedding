@@ -16,7 +16,7 @@ import { confirmationEmail, recoveryEmail } from "./emailTemplates";
 import type { Mailer } from "./mailer";
 import type { SavedResponse } from "./sheet";
 import { hit, LIMITS } from "./rateLimit";
-import { relaxAccommodationSql } from "./schema";
+import { schemaSql } from "./schema";
 import { createToken, fingerprint, hashToken, isWellFormedToken } from "./tokens";
 
 /**
@@ -52,11 +52,12 @@ type ResponseRow = {
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const UNIQUE_VIOLATION = "23505";
 
-// Brings an older production database up to the current accommodation rule without a
-// manual migration. Once per instance; a failure is retried on the next request.
+// Creates the tables in a fresh database and brings an older one up to date, so a newly
+// connected database works without a manual migration. The schema is idempotent and
+// cheap to re-run. Once per instance; a failure is retried on the next request.
 let schemaReady: Promise<void> | null = null;
 function ensureSchema(db: Db): Promise<void> {
-  schemaReady ??= db.query(relaxAccommodationSql).then(
+  schemaReady ??= db.query(schemaSql).then(
     () => undefined,
     (err) => {
       schemaReady = null;
@@ -230,6 +231,7 @@ export type EditableResponse = {
 
 export async function getByToken(db: Db, token: string): Promise<EditableResponse | null> {
   if (!isWellFormedToken(token)) return null;
+  await ensureSchema(db);
   const { rows } = await db.query<ResponseRow>(
     `update rsvp_edit_tokens t set last_used_at = now()
        from rsvp_responses r
@@ -294,6 +296,7 @@ export async function recoverLinks(
   const emailError = validateEmail(body.email);
   if (emailError) return { status: "invalid", errors: { email: emailError } };
   const key = emailKey(body.email as string);
+  await ensureSchema(db);
 
   if (!(await hit(db, `recover:${fingerprint(clientKey)}`, LIMITS.recoverPerIp.limit, LIMITS.recoverPerIp.window))) {
     return { status: "rate_limited" };

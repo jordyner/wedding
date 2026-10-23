@@ -12,7 +12,8 @@ export class StorageUnavailableError extends Error {}
 let pool: Pool | null = null;
 
 export function getDb(): Db {
-  const url = process.env.DATABASE_URL;
+  // DATABASE_URL is what Vercel's Neon integration sets; POSTGRES_URL is its older name.
+  const url = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
   if (!url) throw new StorageUnavailableError("DATABASE_URL is not configured");
   if (!pool) {
     pool = new Pool({
