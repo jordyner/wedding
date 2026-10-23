@@ -39,6 +39,8 @@ const MESSAGES = {
   updated: "Hotovo, změny jsme uložili.",
 } as const;
 
+const SAVED_NOTE_MS = 4500;
+
 function newSubmissionId() {
   return crypto.randomUUID();
 }
@@ -71,8 +73,14 @@ export function RsvpForm({
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState<{ tone: "error" | "success"; text: ReactNode } | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
-  // Without email there is nothing more to say than "saved": a small dialog, and the form stays.
-  const [thanks, setThanks] = useState(false);
+  // Without email there is nothing more to say than "saved": a short note under the button
+  // for a few seconds, and the form stays as it is.
+  const [savedNote, setSavedNote] = useState(0);
+  useEffect(() => {
+    if (!savedNote) return;
+    const t = window.setTimeout(() => setSavedNote(0), SAVED_NOTE_MS);
+    return () => clearTimeout(t);
+  }, [savedNote]);
 
   // One id per filled-in form: a retried or double-sent request resolves to the same record.
   const submissionId = useRef<string | null>(null);
@@ -165,7 +173,7 @@ export function RsvpForm({
         if (data.email === "off") {
           // The next send is a new answer (the latest one counts), not a retry of this one.
           submissionId.current = null;
-          setThanks(true);
+          setSavedNote(Date.now());
           return;
         }
         setOutcome({ kind: data.status, email: data.email, address: values.email.trim() });
@@ -360,39 +368,17 @@ export function RsvpForm({
           {status?.text}
         </p>
       </div>
-      {thanks ? <ThanksDialog onClose={() => setThanks(false)} /> : null}
+      <p className="saved-note" role="status" data-testid="rsvp-saved">
+        {savedNote ? (
+          <span key={savedNote}>
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Díky! Odpověď jsme uložili.
+          </span>
+        ) : null}
+      </p>
     </form>
-  );
-}
-
-/** "Saved" as a small modal with the postmark. Esc, the button or a click outside closes it. */
-function ThanksDialog({ onClose }: { onClose: () => void }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
-  useEffect(() => {
-    const dialog = ref.current;
-    if (dialog && !dialog.open) dialog.showModal();
-  }, []);
-  return (
-    <dialog
-      ref={ref}
-      className="thanks"
-      aria-labelledby={titleId}
-      data-testid="rsvp-thanks"
-      onClose={onClose}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) ref.current?.close();
-      }}
-    >
-      <Postmark />
-      <h2 className="reply-title" id={titleId}>
-        Díky, že dáváš vědět!
-      </h2>
-      <p>Odpověď jsme uložili.</p>
-      <button type="button" className="btn" onClick={() => ref.current?.close()} autoFocus>
-        Zavřít
-      </button>
-    </dialog>
   );
 }
 

@@ -1307,42 +1307,40 @@ a:hover {
   text-wrap: pretty;
 }
 
-/* "Saved" dialog (no email): a small card with the postmark over the page */
-.thanks {
-  width: min(100% - 2 * var(--gutter), 22rem);
-  margin: auto;
-  padding: 2rem 1.5rem 1.75rem;
-  border: 1px solid var(--blush-line);
-  border-radius: 4px;
-  background: var(--paper);
-  color: var(--ink);
-  text-align: center;
-  box-shadow: 0 24px 60px -20px rgb(74 58 38 / 0.45);
-}
-.thanks[open] {
-  display: grid;
-  justify-items: center;
-  gap: 0.9rem;
-  animation: thanks-in 320ms var(--ease-out) both;
-}
-.thanks p {
+/* "Saved" note under the send button (no email): shows for a few seconds, then fades */
+.saved-note {
   margin: 0;
-  color: var(--ink-soft);
+  min-height: 1.6em;
+  text-align: center;
+  font-size: 1.0625rem;
+  color: var(--accent);
 }
-.thanks .btn {
-  margin-top: 0.4rem;
+.saved-note span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  animation: saved-note 4500ms var(--ease-out) both;
 }
-.thanks::backdrop {
-  background: rgb(60 46 30 / 0.28);
+.saved-note svg {
+  width: 1rem;
+  height: 1rem;
 }
-@keyframes thanks-in {
-  from {
+@keyframes saved-note {
+  0% {
     opacity: 0;
-    transform: translateY(10px) scale(0.97);
+    transform: translateY(4px);
+  }
+  8%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .thanks[open] {
+  .saved-note span {
     animation: none;
   }
 }
