@@ -122,17 +122,6 @@ No admin UI and no endpoint lists responses. Use the database directly.
 
 Keep the Neon credentials to the two of you, and use separate Neon roles if anyone else ever needs read access.
 
-## Google Sheets
-
-Every saved answer can also appear in a Google Sheet: one row per guest (name, email, answer, first and last change). If a guest fills in the form again or uses the edit link, their row is updated. The database stays the source of truth: the sheet is written after the guest gets their response, and a failure there never affects them. Answers saved before you set this up are not copied; take them from `rsvp_export`.
-
-1. Open the spreadsheet → **Rozšíření → Apps Script**. Replace everything in the editor with [`integrations/google-sheet.gs`](integrations/google-sheet.gs) and save.
-2. **Project settings** (gear icon) → **Script properties** → add `SECRET` with a long random value (for example the output of `openssl rand -hex 32`).
-3. **Deploy → New deployment** → type **Web app**; *Execute as*: **Me**; *Who has access*: **Anyone**. Authorise it, then copy the **Web app URL** (ends in `/exec`).
-4. In Vercel → Settings → Environment Variables set `GOOGLE_SHEET_WEBHOOK_URL` (that URL) and `GOOGLE_SHEET_SECRET` (the same secret), then redeploy.
-
-The first answer creates the sheet tab **Odpovědi** with headers. "Anyone" only means the URL can be called; without the secret the script ignores the call, and it never returns any data. If you change the script later, use **Deploy → Manage deployments → Edit → New version** so the URL stays the same.
-
 ## Policies
 
 ### Duplicates and identity

@@ -14,7 +14,6 @@ import {
 import type { Db } from "./db";
 import { confirmationEmail, recoveryEmail } from "./emailTemplates";
 import type { Mailer } from "./mailer";
-import type { SavedResponse } from "./sheet";
 import { hit, LIMITS } from "./rateLimit";
 import { schemaSql } from "./schema";
 import { createToken, fingerprint, hashToken, isWellFormedToken } from "./tokens";
@@ -30,13 +29,7 @@ import { createToken, fingerprint, hashToken, isWellFormedToken } from "./tokens
  * - A different name with the same email is a different guest (shared inboxes are fine).
  * - A browser retry carries the same submissionId and resolves to the original record.
  */
-export type Deps = { db: Db; mailer: Mailer; siteUrl: string; onSaved?: OnSaved; emailOff?: boolean };
-/** Called once an answer is stored (new, replaced or edited), e.g. to mirror it to a sheet. */
-export type OnSaved = (r: SavedResponse) => void;
-
-function saved(r: ResponseRow & { id: string }): SavedResponse {
-  return { id: r.id, fullName: r.full_name, email: r.email, attendance: r.attendance, updatedAt: r.updated_at };
-}
+export type Deps = { db: Db; mailer: Mailer; siteUrl: string; emailOff?: boolean };
 
 type ResponseRow = {
   id: string;
@@ -113,10 +106,7 @@ export async function submitRsvp(
     ],
   );
 
-  if (rows[0]) {
-    deps.onSaved?.(saved(rows[0]));
-    return { status: "saved", email: await sendLinkEmail(deps, rows[0], "confirmation") };
-  }
+  if (rows[0]) return { status: "saved", email: await sendLinkEmail(deps, rows[0], "confirmation") };
 
   // Lost a race with our own retry?
   const raced = await findBySubmission(db, submissionId);
@@ -132,7 +122,6 @@ export async function submitRsvp(
     [emailKey(input.email), nameKey(input.fullName), input.fullName, input.attendance, input.accommodation],
   );
   if (!updated.rows[0]) throw new Error("insert conflict without a matching row");
-  deps.onSaved?.(saved(updated.rows[0]));
   return { status: "saved", email: await sendLinkEmail(deps, updated.rows[0], "confirmation") };
 }
 
@@ -254,11 +243,7 @@ export async function getByToken(db: Db, token: string): Promise<EditableRespons
   };
 }
 
-export async function updateByToken(
-  db: Db,
-  body: Record<string, unknown>,
-  onSaved?: OnSaved,
-): Promise<EditResponse> {
+export async function updateByToken(db: Db, body: Record<string, unknown>): Promise<EditResponse> {
   const token = body.token;
   if (!isWellFormedToken(token)) return { status: "invalid_token" };
 
@@ -282,7 +267,6 @@ export async function updateByToken(
       [hash, input.fullName, nameKey(input.fullName), input.attendance, input.accommodation],
     );
     if (!rows[0]) return { status: "invalid_token" };
-    onSaved?.(saved(rows[0]));
     return { status: "updated", updatedAt: new Date(rows[0].updated_at).toISOString() };
   } catch (err) {
     // Renamed to match another guest who shares this inbox.

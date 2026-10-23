@@ -83,24 +83,6 @@ describe("submitRsvp", () => {
     ]);
   });
 
-  it("reports every stored answer once, for mirroring to the sheet", async () => {
-    const seen: { id: string; fullName: string; attendance: string }[] = [];
-    const withHook = { ...deps(), onSaved: (r: { id: string; fullName: string; attendance: string }) => seen.push(r) };
-    const body = answer();
-    await submitRsvp(withHook, body, ip);
-    await submitRsvp(withHook, body, ip); // a retry is not a new answer
-    await submitRsvp(withHook, answer({ attendance: "no" }), ip); // same person again replaces it
-    const [row] = await rows();
-    expect(seen.map((r) => [r.id, r.fullName, r.attendance])).toEqual([
-      [row.id, "Jiří Jordán", "yes"],
-      [row.id, "Jiří Jordán", "no"],
-    ]);
-
-    const token = mailer.lastToken();
-    await updateByToken(db, { token, fullName: "Jiří Jordán", attendance: "undecided" }, (r) => seen.push(r));
-    expect(seen.at(-1)).toMatchObject({ id: row.id, email: "jiri@example.com", attendance: "undecided" });
-  });
-
   it("upgrades a database that still has the old night-choice rule", async () => {
     await pg.exec(`alter table rsvp_responses drop constraint accommodation_only_when_attending;
       alter table rsvp_responses add constraint accommodation_only_when_attending
