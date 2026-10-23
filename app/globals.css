@@ -1307,40 +1307,25 @@ a:hover {
   text-wrap: pretty;
 }
 
-/* "Saved" note under the send button (no email): shows for a few seconds, then fades */
-.saved-note {
-  margin: 0;
-  min-height: 1.6em;
-  text-align: center;
-  font-size: 1.0625rem;
-  color: var(--accent);
-}
-.saved-note span {
+/* "Saved" (no email): the send button says so for a few seconds */
+.btn-saved {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  animation: saved-note 4500ms var(--ease-out) both;
+  gap: 0.45rem;
+  animation: btn-saved 300ms var(--ease-out) both;
 }
-.saved-note svg {
+.btn-saved svg {
   width: 1rem;
   height: 1rem;
 }
-@keyframes saved-note {
-  0% {
+@keyframes btn-saved {
+  from {
     opacity: 0;
-    transform: translateY(4px);
-  }
-  8%,
-  80% {
-    opacity: 1;
-    transform: none;
-  }
-  100% {
-    opacity: 0;
+    transform: translateY(3px);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .saved-note span {
+  .btn-saved {
     animation: none;
   }
 }

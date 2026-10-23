@@ -39,7 +39,7 @@ const MESSAGES = {
   updated: "Hotovo, změny jsme uložili.",
 } as const;
 
-const SAVED_NOTE_MS = 4500;
+const SAVED_NOTE_MS = 3500;
 
 function newSubmissionId() {
   return crypto.randomUUID();
@@ -73,8 +73,8 @@ export function RsvpForm({
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState<{ tone: "error" | "success"; text: ReactNode } | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
-  // Without email there is nothing more to say than "saved": a short note under the button
-  // for a few seconds, and the form stays as it is.
+  // Without email there is nothing more to say than "saved": the form clears and the
+  // send button says so for a few seconds.
   const [savedNote, setSavedNote] = useState(0);
   useEffect(() => {
     if (!savedNote) return;
@@ -173,6 +173,10 @@ export function RsvpForm({
         if (data.email === "off") {
           // The next send is a new answer (the latest one counts), not a retry of this one.
           submissionId.current = null;
+          // Back to a clean form, exactly as it was before.
+          setValues({ fullName: "", email: "", attendance: null, accommodation: null });
+          setSubmitted(false);
+          setErrors({});
           setSavedNote(Date.now());
           return;
         }
@@ -356,6 +360,13 @@ export function RsvpForm({
             </>
           ) : isEdit ? (
             "Uložit změny"
+          ) : savedNote ? (
+            <span className="btn-saved" key={savedNote}>
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Uloženo, díky!
+            </span>
           ) : (
             "Odeslat odpověď"
           )}
@@ -367,17 +378,10 @@ export function RsvpForm({
         >
           {status?.text}
         </p>
+        <p className="sr-only" role="status" data-testid="rsvp-saved">
+          {savedNote ? "Díky! Odpověď jsme uložili." : ""}
+        </p>
       </div>
-      <p className="saved-note" role="status" data-testid="rsvp-saved">
-        {savedNote ? (
-          <span key={savedNote}>
-            <svg viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Díky! Odpověď jsme uložili.
-          </span>
-        ) : null}
-      </p>
     </form>
   );
 }
